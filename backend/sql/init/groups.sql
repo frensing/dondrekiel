@@ -1,15 +1,8 @@
-CREATE TABLE IF NOT EXISTS groups
+create table if not exists groups
 (
-    id
-         INTEGER
-        PRIMARY
-            KEY
-        AUTOINCREMENT,
-    name text,
-    locationDate
-         TIMESTAMP,
-    locationLatitude
-         NUMERIC,
-    locationLongitude
-         NUMERIC
+    id           integer primary key autoincrement,
+    name         text,
+    locationDate timestamp,
+    latitude     real,
+    longitude    real
 );

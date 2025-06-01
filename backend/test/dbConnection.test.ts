@@ -12,13 +12,16 @@ describe("Database Connection", () => {
 
   test("should init db if no tables exist", async () => {
     const db = await getDb();
-    const resultBefore = await db.get("select count(*) as tableCount from sqlite_master");
-    expect(resultBefore.tableCount).toBe(1);
+    const resultBefore = await db.get("select count(*) as tableCount from sqlite_master where name is not 'sqlite_sequence'");
+    expect(resultBefore.tableCount).toBe(0);
 
     await initDb(db);
 
-    const result = await db.get("select count(*) as tableCount from sqlite_master");
-    expect(result.tableCount).toBe(2);
+    const result = await db.all("select name from sqlite_master where name is not 'sqlite_sequence'");
+
+    expect(result).toEqual([{
+      name: "groups",
+    }]);
 
     await db.close();
   });

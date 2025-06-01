@@ -1,14 +1,15 @@
 CREATE TABLE IF NOT EXISTS groups
 (
     id
-        INTEGER
+         INTEGER
         PRIMARY
             KEY
         AUTOINCREMENT,
+    name text,
     locationDate
-        TIMESTAMP,
+         TIMESTAMP,
     locationLatitude
-        NUMERIC,
+         NUMERIC,
     locationLongitude
-        NUMERIC
+         NUMERIC
 );

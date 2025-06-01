@@ -1,5 +1,5 @@
 import * as fs from "node:fs";
-import { Database } from "sqlite";
+import db from "./db";
 
 export interface Group {
   id: number;
@@ -9,11 +9,15 @@ export interface Group {
   longitude: number;
 }
 
-export async function addGroup(db: Database, name: string) {
+export function addGroup(name: string) {
   const insertSql = fs.readFileSync("./sql/groups/insert.sql", "utf8");
 
-  const stmt = await db.prepare(insertSql, [name]);
-  const result = await stmt.run();
+  const result = db.prepare(insertSql).run(name);
 
-  return result.lastID;
+  return result.lastInsertRowid;
+}
+
+export function getAllGroups() {
+  const sql = fs.readFileSync("./sql/groups/getAll.sql", "utf8");
+  return db.prepare(sql).all();
 }

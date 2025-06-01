@@ -1,30 +1,24 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 
-import { getDb, initDb } from "../../src/models/db";
+import db, { initDb } from "../../src/models/db";
 
 describe("Database Connection", () => {
-  beforeEach(async () => {
-    const db = await getDb();
-
-    await db.run("drop table if exists groups");
-    await db.run("drop table if exists stations");
-    await db.close();
+  beforeEach(() => {
+    db.exec("drop table if exists groups");
+    db.exec("drop table if exists stations");
   });
 
-  test("should init db if no tables exist", async () => {
-    const db = await getDb();
-    const resultBefore = await db.get("select count(*) as tableCount from sqlite_master where name is not 'sqlite_sequence'");
-    expect(resultBefore.tableCount).toBe(0);
+  test("should init db if no tables exist", () => {
+    const resultBefore = db.prepare("select name from sqlite_master where name is not 'sqlite_sequence'").all();
+    expect(resultBefore).toEqual([]);
 
-    await initDb(db);
+    initDb();
 
-    const result = await db.all("select name from sqlite_master where name is not 'sqlite_sequence'");
+    const result = db.prepare("select name from sqlite_master where name is not 'sqlite_sequence'").all();
 
     expect(result).toEqual([
       { name: "groups" },
       { name: "stations" }
     ]);
-
-    await db.close();
   });
 });

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 
-import { getDb, initDb } from "../src/models/db";
+import { getDb, initDb } from "../../src/models/db";
 
 describe("Database Connection", () => {
   beforeEach(async () => {

@@ -7,7 +7,8 @@ describe("Database Connection", () => {
     const db = await getDb();
 
     await db.run("drop table if exists groups");
-    db.close();
+    await db.run("drop table if exists stations");
+    await db.close();
   });
 
   test("should init db if no tables exist", async () => {
@@ -19,9 +20,10 @@ describe("Database Connection", () => {
 
     const result = await db.all("select name from sqlite_master where name is not 'sqlite_sequence'");
 
-    expect(result).toEqual([{
-      name: "groups",
-    }]);
+    expect(result).toEqual([
+      { name: "groups" },
+      { name: "stations" }
+    ]);
 
     await db.close();
   });

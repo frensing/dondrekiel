@@ -11,8 +11,11 @@ export async function getDb() {
 }
 
 export async function initDb(db: Database) {
-  const groupTableCreateSql = fs.readFileSync("./sql/init/groups.sql", "utf8");
-  await db.run(groupTableCreateSql);
+  const groupsTableSql = fs.readFileSync("./sql/init/groups.sql", "utf8");
+  await db.run(groupsTableSql);
+
+  const stationsTableSql = fs.readFileSync("./sql/init/stations.sql", "utf8");
+  await db.run(stationsTableSql);
 
   return db;
 }

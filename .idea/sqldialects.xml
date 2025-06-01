@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/backend/sql/init/groups.sql" dialect="SQLite" />
-    <file url="file://$PROJECT_DIR$/backend/sql/init/stations.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/backend/sql/groups/getAll.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/backend/sql/groups/init.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/backend/sql/groups/insert.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/backend/sql/stations/init.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/backend/src/models/db.ts" dialect="SQLite" />
     <file url="PROJECT" dialect="SQLite" />
   </component>

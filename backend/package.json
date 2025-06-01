@@ -10,7 +10,9 @@
     "test": "NODE_ENV=test jest --verbose  --runInBand"
   },
   "devDependencies": {
+    "@eslint/js": "^9.28.0",
     "eslint": "^9.28.0",
+    "globals": "^16.2.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.0"
@@ -20,6 +22,7 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.5.0",
     "express": "^5.1.0"
   }
 }

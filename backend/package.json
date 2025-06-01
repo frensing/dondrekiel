@@ -13,6 +13,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@eslint/js": "^9.28.0",
     "@jest/globals": "^30.0.0-beta.3",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/express": "^5.0.2",
     "@types/morgan": "^1.9.9",
     "@types/supertest": "^6.0.3",
@@ -30,10 +31,9 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
+    "better-sqlite3": "^11.10.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "morgan": "^1.10.0",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.7"
+    "morgan": "^1.10.0"
   }
 }

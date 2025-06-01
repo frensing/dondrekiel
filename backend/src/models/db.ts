@@ -1,21 +1,18 @@
-import * as sqlite3 from "sqlite3";
 import config from "../config";
-import { Database, open } from "sqlite";
 import * as fs from "node:fs";
+import dbConstuctor from "better-sqlite3";
 
-export async function getDb() {
-  return await open({
-    filename: config.SQLITE_PATH,
-    driver: sqlite3.Database,
-  });
-}
+const db = dbConstuctor(config.SQLITE_PATH);
+db.pragma("journal_mode = WAL");
 
-export async function initDb(db: Database) {
+export function initDb() {
   const groupsTableSql = fs.readFileSync("./sql/groups/init.sql", "utf8");
-  await db.run(groupsTableSql);
+  db.prepare(groupsTableSql).run();
 
   const stationsTableSql = fs.readFileSync("./sql/stations/init.sql", "utf8");
-  await db.run(stationsTableSql);
+  db.prepare(stationsTableSql).run();
 
   return db;
 }
+
+export default db;

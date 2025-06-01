@@ -1,12 +1,9 @@
 import supertest from "supertest";
 
 import app from "../../src/app";
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, test } from "@jest/globals";
 
 const api = supertest(app);
-
-jest.mock("../../src/models/groups");
-
 
 describe("groups endpoint", () => {
   test("should return a list of groups", async () => {

@@ -15,6 +15,6 @@ app.use(morgan("dev"));
 app.use("/api/v1/groups", groupsRouter);
 app.use("/api/v1/stations", stationsRouter);
 
-app.use(middleware.unkownEndpoint);
+app.use(middleware.unknownEndpoint);
 
 export default app;

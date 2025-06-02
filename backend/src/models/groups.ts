@@ -19,5 +19,5 @@ export function addGroup(name: string) {
 
 export function getAllGroups() {
   const sql = fs.readFileSync("./sql/groups/getAll.sql", "utf8");
-  return db.prepare(sql).all();
+  return db.prepare(sql).all() as Group[];
 }

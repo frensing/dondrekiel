@@ -1,12 +1,10 @@
 import express from "express";
+import { getAllGroups } from "../models/groups";
 
 const groupsRouter = express.Router();
 
 groupsRouter.get("/", async (_req, res) => {
-  const groups = [{
-    id: 1,
-    name: "Gruppe 1",
-  }];
+  const groups = getAllGroups();
 
   res.json(groups);
 });

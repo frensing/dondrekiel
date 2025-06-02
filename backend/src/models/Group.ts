@@ -4,9 +4,9 @@ import db from "./db";
 export interface Group {
   id: number;
   name: string;
-  locationDate: Date;
-  latitude: number;
-  longitude: number;
+  locationDate: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export function addGroup(name: string) {

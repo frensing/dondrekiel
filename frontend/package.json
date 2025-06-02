@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "buildForBackend": "tsc -b && vite build --emptyOutDir --outDir ../backend/dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },

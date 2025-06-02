@@ -10,8 +10,8 @@ describe("groups endpoint", () => {
     name: "Gruppe 1",
   }];
 
-  jest.mock("../../src/models/groups", () => {
-    const originalModule = jest.requireActual("../../src/models/groups") as object;
+  jest.mock("../../src/models/Group", () => {
+    const originalModule = jest.requireActual("../../src/models/Group") as object;
     return {
       __esModule: true,
       ...originalModule,

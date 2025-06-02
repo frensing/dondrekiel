@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 import db, { initDb } from "../../src/models/db";
-import { addGroup, getAllGroups } from "../../src/models/groups";
+import { addGroup, getAllGroups } from "../../src/models/Group";
 
 describe("groups model", () => {
   beforeEach(() => {

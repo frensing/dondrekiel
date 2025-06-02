@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllGroups } from "../models/groups";
+import { getAllGroups } from "../models/Group";
 
 const groupsRouter = express.Router();
 

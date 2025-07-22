@@ -73,6 +73,8 @@ export default defineConfig({
     },
   },
   server: {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     https: true,
     host: true,
   },

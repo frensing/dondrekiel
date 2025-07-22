@@ -1,6 +1,6 @@
 import { useGeolocated } from "react-geolocated";
 
-const Map = () => {
+const MapView = () => {
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
     useGeolocated({
       positionOptions: {
@@ -45,4 +45,4 @@ const Map = () => {
   );
 };
 
-export default Map;
+export default MapView;

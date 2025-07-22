@@ -1,41 +1,24 @@
-import PWABadge from "./PWABadge.tsx";
 import "./App.css";
-import Map from "./components/Map.tsx";
-import {Link, Route, Routes} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Stationen from "./components/Stationen.tsx";
 import Nachrichten from "./components/Nachrichten.tsx";
-import PwaBackgroundSync from "./PwaBackgroundSync.tsx";
+import MapView from "@/components/MapView.tsx";
+import { BottomNav } from "@/components/BottomNav.tsx";
 
 function App() {
-    const padding = {
-        padding: 5,
-    };
+  return (
+    <div className="">
+      {/*<PwaBackgroundSync />*/}
+      {/*<PWABadge />*/}
+      <Routes>
+        <Route path="/" element={<MapView />} />
+        <Route path="/stationen" element={<Stationen />} />
+        <Route path="/nachrichten" element={<Nachrichten />} />
+      </Routes>
 
-    return (
-        <>
-
-
-            <Routes>
-                <Route path="/" element={<Map/>}/>
-                <Route path="/stationen" element={<Stationen/>}/>
-                <Route path="/nachrichten" element={<Nachrichten/>}/>
-            </Routes>
-
-            <div>
-                <Link style={padding} to="/">
-                    Karte
-                </Link>
-                <Link style={padding} to="/stationen">
-                    Stationen
-                </Link>
-                <Link style={padding} to="/nachrichten">
-                    Nachrichten
-                </Link>
-            </div>
-            <PwaBackgroundSync/>
-            <PWABadge/>
-        </>
-    );
+      <BottomNav />
+    </div>
+  );
 }
 
 export default App;

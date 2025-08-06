@@ -1,6 +1,6 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import Stationen from "./components/Stationen.tsx";
+import StationList from "./components/StationList.tsx";
 import MessageList from "./components/MessageList.tsx";
 import MapView from "@/components/MapView.tsx";
 import { BottomNav } from "@/components/BottomNav.tsx";
@@ -13,7 +13,7 @@ function App() {
       <div className="pb-22">
         <Routes>
           <Route path="/" element={<MapView />} />
-          <Route path="/stationen" element={<Stationen />} />
+          <Route path="/stationen" element={<StationList />} />
           <Route path="/nachrichten" element={<MessageList />} />
         </Routes>
       </div>

@@ -10,6 +10,13 @@
     height: 100%;
 }
 
+.station-marker {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
 
 .logo {
     height: 6em;

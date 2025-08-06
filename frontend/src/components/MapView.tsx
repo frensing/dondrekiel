@@ -2,10 +2,12 @@ import { useGeolocated } from "react-geolocated";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { Card, CardContent } from "@/components/ui/card";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
+import { useLocation } from "react-router-dom";
+import { Station } from "@/types/Station";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
 import { Loader2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Fix for default marker icons in React Leaflet
 const defaultIcon = L.icon({
@@ -21,6 +23,12 @@ const defaultIcon = L.icon({
 L.Marker.prototype.options.icon = defaultIcon;
 
 const MapView = () => {
+  const location = useLocation();
+  const mapRef = useRef<L.Map | null>(null);
+  const selectedStation = location.state?.selectedStation as
+    | Station
+    | undefined;
+
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
     useGeolocated({
       positionOptions: {
@@ -30,6 +38,16 @@ const MapView = () => {
       watchLocationPermissionChange: true,
       userDecisionTimeout: 25000,
     });
+
+  // Handle selected station
+  useEffect(() => {
+    if (selectedStation && mapRef.current) {
+      mapRef.current.setView(
+        [selectedStation.latitude, selectedStation.longitude],
+        15,
+      );
+    }
+  }, [selectedStation]);
 
   // Make sure the map container is properly sized
   useEffect(() => {
@@ -75,26 +93,45 @@ const MapView = () => {
   return (
     <Card className="m-4 overflow-hidden border rounded-lg shadow-lg">
       <MapContainer
-        center={[coords.latitude, coords.longitude]}
+        center={[
+          selectedStation?.latitude || coords?.latitude || 0,
+          selectedStation?.longitude || coords?.longitude || 0,
+        ]}
         zoom={13}
         scrollWheelZoom={true}
         className="w-full h-[calc(100vh-6rem)]"
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[coords.latitude, coords.longitude]}>
-          <Popup className="rounded-md">
-            <div className="p-1">
-              <h3 className="font-semibold">Your Location</h3>
-              <p className="text-sm text-muted-foreground">
-                Lat: {coords.latitude.toFixed(4)}, Lng:{" "}
-                {coords.longitude.toFixed(4)}
-              </p>
-            </div>
-          </Popup>
-        </Marker>
+
+        {/* User location marker */}
+        {coords && (
+          <Marker position={[coords.latitude, coords.longitude]}>
+            <Popup>Your current location</Popup>
+          </Marker>
+        )}
+
+        {/* Selected station marker */}
+        {selectedStation && (
+          <Marker
+            position={[selectedStation.latitude, selectedStation.longitude]}
+            icon={L.divIcon({
+              className: "bg-primary text-white p-2 rounded-full",
+              html: `<div class="station-marker"></div>`,
+              iconSize: [30, 30],
+            })}
+          >
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-bold">{selectedStation.name}</h3>
+                <p className="text-sm">{selectedStation.description}</p>
+              </div>
+            </Popup>
+          </Marker>
+        )}
       </MapContainer>
     </Card>
   );

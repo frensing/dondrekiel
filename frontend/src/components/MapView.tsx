@@ -92,11 +92,9 @@ const MapView = () => {
         scrollWheelZoom={true}
         className="w-full h-full"
         ref={mapRef}
+        attributionControl={false}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {/* User location marker */}
         {coords && (

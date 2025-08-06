@@ -2,11 +2,11 @@ import * as fs from "node:fs";
 import db from "./db";
 
 export interface Station {
-  id: number;
-  name: string;
-  description: string;
-  latitude: number;
-  longitude: number;
+    id: number;
+    name: string;
+    description: string;
+    latitude: number;
+    longitude: number;
 }
 
 export function addStation(name: string, description: string, latitude: number, longitude: number) {
@@ -17,5 +17,5 @@ export function addStation(name: string, description: string, latitude: number, 
 
 export function getAllStations() {
   const sql = fs.readFileSync("./sql/stations/getAll.sql", "utf8");
-  return db.prepare(sql).all() as Station[];
+  return db.prepare(sql).all() as unknown as Station[];
 }

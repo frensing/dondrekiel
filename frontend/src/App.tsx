@@ -7,16 +7,16 @@ import { BottomNav } from "@/components/BottomNav.tsx";
 
 function App() {
   return (
-    <div className="flex flex-col">
-      {/*<PwaBackgroundSync />*/}
-      {/*<PWABadge />*/}
-      <div className="pb-22">
+    <div className="flex flex-col h-screen">
+      <main className="flex-1 overflow-y-auto pb-20">
+        {" "}
+        {/* pb-16 accounts for BottomNav height */}
         <Routes>
           <Route path="/" element={<MapView />} />
           <Route path="/stationen" element={<StationList />} />
           <Route path="/nachrichten" element={<MessageList />} />
         </Routes>
-      </div>
+      </main>
       <BottomNav />
     </div>
   );

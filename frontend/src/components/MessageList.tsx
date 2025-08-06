@@ -65,7 +65,7 @@ export default function MessageList() {
           <Card className="md:max-w-md w-full gap-0 rounded-2xl p-2 bg-gray-100 text-gray-900">
             <CardHeader className="p-2 pb-0 text-left">
               <CardTitle className="text-sm font-bold text-left">
-                Spielleitung
+                {message.sender}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2 pt-0 flex flex-col">

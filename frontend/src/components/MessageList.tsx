@@ -59,7 +59,7 @@ export default function MessageList() {
   }, [messages]);
 
   return (
-    <div className="space-y-2 overflow-y-auto">
+    <div className="space-y-2 overflow-y-auto p-8">
       {messages.map((message, index) => (
         <div key={index} className="flex justify-start">
           <Card className="md:max-w-md w-full gap-0 rounded-2xl p-2 bg-gray-100 text-gray-900">

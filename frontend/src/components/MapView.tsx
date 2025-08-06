@@ -1,6 +1,5 @@
 import { useGeolocated } from "react-geolocated";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { Card, CardContent } from "@/components/ui/card";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef } from "react";
 import L from "leaflet";
@@ -49,14 +48,6 @@ const MapView = () => {
     }
   }, [selectedStation]);
 
-  // Make sure the map container is properly sized
-  useEffect(() => {
-    const map = document.querySelector(".leaflet-container");
-    if (map) {
-      (map as HTMLElement).style.height = "calc(100vh - 5rem)";
-    }
-  }, []);
-
   if (!isGeolocationAvailable) {
     return (
       <Alert variant="destructive" className="m-4">
@@ -81,17 +72,17 @@ const MapView = () => {
 
   if (!coords) {
     return (
-      <Card className="m-4">
-        <CardContent className="flex items-center justify-center p-6">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <p>Getting your location...</p>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
+        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+        <p>Getting your location...</p>
+      </div>
     );
   }
 
   return (
-    <Card className="m-4 overflow-hidden border rounded-lg shadow-lg">
+    <div className="h-[calc(100vh-5rem)]">
+      {" "}
+      {/* Adjust height to account for bottom nav */}
       <MapContainer
         center={[
           selectedStation?.latitude || coords?.latitude || 0,
@@ -99,7 +90,7 @@ const MapView = () => {
         ]}
         zoom={13}
         scrollWheelZoom={true}
-        className="w-full h-[calc(100vh-6rem)]"
+        className="w-full h-full"
         ref={mapRef}
       >
         <TileLayer
@@ -133,7 +124,7 @@ const MapView = () => {
           </Marker>
         )}
       </MapContainer>
-    </Card>
+    </div>
   );
 };
 

@@ -17,3 +17,12 @@ Fürs Deployment kann das Frontend aus dem Frontend-Verzeichnis mit `npm run bui
 Backend-Verzeichnis gebaut werden.
 
 Im Backend-Verzeichnis kann der Node dann mit `npm run start` ausgeführt werden.
+
+## Deployment auf Uberspace
+
+- Per SSH auf dem Server anmelden
+- In den Code-Ordner wechseln `cd ~/dondrekiel-app`
+- Änderungen ziehen `git pull`
+- Zum Frontend wechseln `cd ~/dondrekiel-app/frontend`
+- Build durchführen `npm run buildForBackend`
+- Service neustarten `supervisorctl restart dondrekiel-app`

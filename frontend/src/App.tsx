@@ -7,15 +7,16 @@ import { BottomNav } from "@/components/BottomNav.tsx";
 
 function App() {
   return (
-    <div className="">
+    <div className="flex flex-col">
       {/*<PwaBackgroundSync />*/}
       {/*<PWABadge />*/}
-      <Routes>
-        <Route path="/" element={<MapView />} />
-        <Route path="/stationen" element={<Stationen />} />
-        <Route path="/nachrichten" element={<MessageList />} />
-      </Routes>
-
+      <div className="pb-22">
+        <Routes>
+          <Route path="/" element={<MapView />} />
+          <Route path="/stationen" element={<Stationen />} />
+          <Route path="/nachrichten" element={<MessageList />} />
+        </Routes>
+      </div>
       <BottomNav />
     </div>
   );

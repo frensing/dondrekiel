@@ -2,8 +2,10 @@ import { NavLink } from "react-router-dom";
 import { Flag, Map, MessageCircle } from "lucide-react";
 
 export function BottomNav() {
-  const baseLinkClasses =
-    "flex flex-col items-center text-gray-600 hover:text-black w-full";
+  const baseLinkClasses = "flex flex-col items-center w-full";
+
+  const getLinkClasses = ({ isActive }: { isActive: boolean }) =>
+    `${baseLinkClasses} ${isActive ? "text-blue-500" : "text-gray-600 hover:text-black"}`;
 
   return (
     <nav
@@ -15,15 +17,15 @@ export function BottomNav() {
       }}
     >
       <div className="flex justify-between items-center h-16">
-        <NavLink to="/" className={baseLinkClasses}>
+        <NavLink to="/" className={getLinkClasses}>
           <Map className="w-6 h-6" />
           <span className="text-xs mt-1">Home</span>
         </NavLink>
-        <NavLink to="/stationen" className={baseLinkClasses}>
+        <NavLink to="/stationen" className={getLinkClasses}>
           <Flag className="w-6 h-6" />
           <span className="text-xs mt-1">Stationen</span>
         </NavLink>
-        <NavLink to="/nachrichten" className={baseLinkClasses}>
+        <NavLink to="/nachrichten" className={getLinkClasses}>
           <MessageCircle className="w-6 h-6" />
           <span className="text-xs mt-1">Nachrichten</span>
         </NavLink>

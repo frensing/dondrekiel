@@ -1,9 +1,9 @@
 import config from "../config";
 import * as fs from "node:fs";
-import dbConstuctor from "better-sqlite3";
+import * as sqlite from "node:sqlite";
 
-const db = dbConstuctor(config.SQLITE_PATH);
-db.pragma("journal_mode = WAL");
+
+const db = new sqlite.DatabaseSync(config.SQLITE_PATH);
 
 export function initDb() {
   const groupsTableSql = fs.readFileSync("./sql/groups/init.sql", "utf8");

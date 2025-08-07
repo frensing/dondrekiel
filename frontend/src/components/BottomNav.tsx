@@ -19,7 +19,7 @@ export function BottomNav() {
       <div className="flex justify-between items-center h-16">
         <NavLink to="/" className={getLinkClasses}>
           <Map className="w-6 h-6" />
-          <span className="text-xs mt-1">Home</span>
+          <span className="text-xs mt-1">Karte</span>
         </NavLink>
         <NavLink to="/stationen" className={getLinkClasses}>
           <Flag className="w-6 h-6" />

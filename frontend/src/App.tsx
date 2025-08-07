@@ -4,6 +4,7 @@ import StationList from "./components/StationList.tsx";
 import MessageList from "./components/MessageList.tsx";
 import MapView from "@/components/MapView.tsx";
 import { BottomNav } from "@/components/BottomNav.tsx";
+import { Toaster } from "@/components/ui/sonner.tsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/stationen" element={<StationList />} />
           <Route path="/nachrichten" element={<MessageList />} />
         </Routes>
+        <Toaster />
       </main>
       <BottomNav />
     </div>

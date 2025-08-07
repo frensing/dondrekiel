@@ -5,10 +5,10 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import { useLocation } from "react-router-dom";
 import { Station } from "@/types/Station";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx";
-import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Locate } from "lucide-react";
 
-// Fix for default marker icons in React Leaflet
 const defaultIcon = L.icon({
   iconUrl: "/marker-icon.png",
   iconRetinaUrl: "/marker-icon-2x.png",
@@ -20,6 +20,9 @@ const defaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = defaultIcon;
+
+// Default coordinates (can be set to your city's coordinates)
+const DEFAULT_COORDINATES = { latitude: 51.854, longitude: 7.78 }; // Example: Berlin
 
 const MapView = () => {
   const location = useLocation();
@@ -48,45 +51,35 @@ const MapView = () => {
     }
   }, [selectedStation]);
 
-  if (!isGeolocationAvailable) {
-    return (
-      <Alert variant="destructive" className="m-4">
-        <AlertTitle>Geolocation Not Supported</AlertTitle>
-        <AlertDescription>
-          Your browser does not support geolocation features.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  const handleCenterLocation = () => {
+    if (!isGeolocationAvailable) {
+      toast("Geolocation Not Supported");
+      return;
+    }
 
-  if (!isGeolocationEnabled) {
-    return (
-      <Alert className="m-4">
-        <AlertTitle>Location Access Required</AlertTitle>
-        <AlertDescription>
-          Please enable location services to use the map features.
-        </AlertDescription>
-      </Alert>
-    );
-  }
+    if (!isGeolocationEnabled) {
+      toast("Location Access Required");
+      return;
+    }
 
-  if (!coords) {
-    return (
-      <div className="flex items-center justify-center h-[calc(100vh-5rem)]">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" />
-        <p>Getting your location...</p>
-      </div>
-    );
-  }
+    if (!coords) {
+      toast("Location Unavailable");
+      return;
+    }
+
+    mapRef.current?.setView([coords.latitude, coords.longitude], 15);
+  };
 
   return (
-    <div className="h-[calc(100vh-5rem)]">
-      {" "}
-      {/* Adjust height to account for bottom nav */}
+    <div className="h-[calc(100vh-5rem)] relative">
       <MapContainer
         center={[
-          selectedStation?.latitude || coords?.latitude || 0,
-          selectedStation?.longitude || coords?.longitude || 0,
+          selectedStation?.latitude ||
+            coords?.latitude ||
+            DEFAULT_COORDINATES.latitude,
+          selectedStation?.longitude ||
+            coords?.longitude ||
+            DEFAULT_COORDINATES.longitude,
         ]}
         zoom={13}
         scrollWheelZoom={true}
@@ -122,6 +115,16 @@ const MapView = () => {
           </Marker>
         )}
       </MapContainer>
+
+      {/* Location centering button */}
+      <Button
+        variant="secondary"
+        size="icon"
+        className="absolute bottom-6 right-6 rounded-full shadow-lg z-[1000]"
+        onClick={handleCenterLocation}
+      >
+        <Locate className="h-5 w-5" />
+      </Button>
     </div>
   );
 };

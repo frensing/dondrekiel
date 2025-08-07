@@ -22,7 +22,7 @@ const defaultIcon = L.icon({
 L.Marker.prototype.options.icon = defaultIcon;
 
 // Default coordinates (can be set to your city's coordinates)
-const DEFAULT_COORDINATES = { latitude: 51.854, longitude: 7.78 }; // Example: Berlin
+const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: Berlin
 
 const MapView = () => {
   const location = useLocation();

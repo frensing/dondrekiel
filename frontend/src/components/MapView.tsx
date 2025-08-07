@@ -44,11 +44,11 @@ const MapView = () => {
   const [initialCenteringDone, setInitialCenteringDone] = useState(false);
   // Handle selected station and initial user location
   useEffect(() => {
-    if (!initialCenteringDone && coords && mapRef.current) {
+    if (!initialCenteringDone && !selectedStation && coords && mapRef.current) {
       mapRef.current.setView([coords.latitude, coords.longitude], 15);
       setTimeout(() => setInitialCenteringDone(true), 1000);
     }
-  }, [coords, initialCenteringDone]); // Only run once on mount
+  }, [coords, initialCenteringDone, selectedStation]); // Only run once on mount
 
   useEffect(() => {
     if (selectedStation && mapRef.current) {

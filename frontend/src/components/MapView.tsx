@@ -1,7 +1,7 @@
 import { useGeolocated } from "react-geolocated";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { useLocation } from "react-router-dom";
 import { Station } from "@/types/Station";
@@ -41,7 +41,15 @@ const MapView = () => {
       userDecisionTimeout: 25000,
     });
 
-  // Handle selected station
+  const [initialCenteringDone, setInitialCenteringDone] = useState(false);
+  // Handle selected station and initial user location
+  useEffect(() => {
+    if (!initialCenteringDone && coords && mapRef.current) {
+      mapRef.current.setView([coords.latitude, coords.longitude], 15);
+      setTimeout(() => setInitialCenteringDone(true), 1000);
+    }
+  }, [coords, initialCenteringDone]); // Only run once on mount
+
   useEffect(() => {
     if (selectedStation && mapRef.current) {
       mapRef.current.setView(
@@ -81,7 +89,7 @@ const MapView = () => {
             coords?.longitude ||
             DEFAULT_COORDINATES.longitude,
         ]}
-        zoom={13}
+        zoom={15}
         scrollWheelZoom={true}
         className="w-full h-full"
         ref={mapRef}

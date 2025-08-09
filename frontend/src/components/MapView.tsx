@@ -79,7 +79,7 @@ const MapView = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-5rem)] relative">
+    <div className="h-full relative">
       <MapContainer
         center={[
           selectedStation?.latitude ||

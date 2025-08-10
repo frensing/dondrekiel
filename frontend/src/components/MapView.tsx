@@ -104,12 +104,10 @@ const MapView = () => {
             icon={L.divIcon({
               className: "relative",
               html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
-              iconSize: [16, 16],
-              iconAnchor: [8, 8],
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
             })}
-          >
-            <Popup>Your current location</Popup>
-          </Marker>
+          ></Marker>
         )}
 
         {/* Selected station marker */}

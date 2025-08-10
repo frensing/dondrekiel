@@ -1,10 +1,10 @@
 import express from "express";
-import { getAllGroups } from "../models/Group";
+import { getAllTeams } from "../models/Team";
 
 const groupsRouter = express.Router();
 
 groupsRouter.get("/", async (_req, res) => {
-  const groups = getAllGroups();
+  const groups = getAllTeams();
 
   res.json(groups);
 });

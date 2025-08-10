@@ -6,21 +6,21 @@ const api = supertest(app);
 
 const users = [{
   id: 1,
-  name: "Gruppe 1",
+  name: "Team 1",
 }];
 
-jest.mock("../../src/models/Group", () => {
-  const originalModule = jest.requireActual("../../src/models/Group") as object;
+jest.mock("../../src/models/Team", () => {
+  const originalModule = jest.requireActual("../../src/models/Team") as object;
   return {
     __esModule: true,
     ...originalModule,
-    getAllGroups: jest.fn(() => users),
+    getAllTeams: jest.fn(() => users),
   };
 });
 
-describe("groups endpoint", () => {
-  test("should return a list of groups", async () => {
-    const result = await api.get("/api/v1/groups")
+describe("teams endpoint", () => {
+  test("should return a list of teams", async () => {
+    const result = await api.get("/api/v1/teams")
       .expect(200)
       .expect("Content-Type", /json/);
 

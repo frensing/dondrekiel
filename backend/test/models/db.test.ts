@@ -4,7 +4,7 @@ import db, { initDb } from "../../src/models/db";
 
 describe("Database Connection", () => {
   beforeEach(() => {
-    db.exec("drop table if exists groups");
+    db.exec("drop table if exists teams");
     db.exec("drop table if exists stations");
   });
 
@@ -17,7 +17,7 @@ describe("Database Connection", () => {
     const result = db.prepare("select name from sqlite_master where name is not 'sqlite_sequence'").all();
 
     expect(result).toEqual([
-      { name: "groups" },
+      { name: "teams" },
       { name: "stations" }
     ]);
   });

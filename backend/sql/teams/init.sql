@@ -1,4 +1,4 @@
-create table if not exists groups
+create table if not exists teams
 (
     id           integer primary key autoincrement,
     name         text,

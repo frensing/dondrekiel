@@ -1,42 +1,42 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 import db, { initDb } from "../../src/models/db";
-import { addGroup, getAllGroups } from "../../src/models/Group";
+import { addTeam, getAllTeams } from "../../src/models/Team";
 
-describe("groups model", () => {
+describe("teams model", () => {
   beforeEach(() => {
-    db.prepare("drop table if exists groups").run();
+    db.prepare("drop table if exists teams").run();
     initDb();
   });
 
   test("should add a group to the db", () => {
-    const id = addGroup("TestGroup");
+    const id = addTeam("TestTeam");
 
-    const result = db.prepare("select * from groups where id = ?").get(id);
+    const result = db.prepare("select * from teams where id = ?").get(id);
     expect(result).toEqual({
       id,
-      name: "TestGroup",
+      name: "TestTeam",
       locationDate: null,
       latitude: null,
       longitude: null,
     });
   });
 
-  test("should return all groups", () => {
-    const id1 = addGroup("Group 1");
-    const id2 = addGroup("Group 2");
+  test("should return all teams", () => {
+    const id1 = addTeam("Team 1");
+    const id2 = addTeam("Team 2");
 
-    const result = getAllGroups();
+    const result = getAllTeams();
     expect(result).toEqual([
       {
         id: id1,
-        name: "Group 1",
+        name: "Team 1",
         locationDate: null,
         latitude: null,
         longitude: null,
       },
       {
         id: id2,
-        name: "Group 2",
+        name: "Team 2",
         locationDate: null,
         latitude: null,
         longitude: null,

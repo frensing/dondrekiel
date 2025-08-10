@@ -6,8 +6,8 @@ import * as sqlite from "node:sqlite";
 const db = new sqlite.DatabaseSync(config.SQLITE_PATH);
 
 export function initDb() {
-  const groupsTableSql = fs.readFileSync("./sql/groups/init.sql", "utf8");
-  db.prepare(groupsTableSql).run();
+  const teamsTableSql = fs.readFileSync("./sql/teams/init.sql", "utf8");
+  db.prepare(teamsTableSql).run();
 
   const stationsTableSql = fs.readFileSync("./sql/stations/init.sql", "utf8");
   db.prepare(stationsTableSql).run();

@@ -1,4 +1,4 @@
-export interface Group {
+export interface Team {
   id: number;
   name: string;
   locationDate: number | null;

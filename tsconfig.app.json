@@ -23,7 +23,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "baseUrl": "./frontend",
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"

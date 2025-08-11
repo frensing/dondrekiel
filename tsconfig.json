@@ -9,7 +9,7 @@
     }
   ],
   "compilerOptions": {
-    "baseUrl": "./frontend",
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"

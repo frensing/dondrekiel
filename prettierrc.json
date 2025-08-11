@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "overrides": [
+    {
+      "files": "*.test.js",
+      "options": {
+        "semi": true,
+        "singleQuote": true
+      }
+    }
+  ]
+}

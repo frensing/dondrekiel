@@ -1,0 +1,4 @@
+db-uri = "postgres://authenticator:<password>@localhost:5432/dondrekiel-db"
+db-schemas = "api"
+db-anon-role = "web_anon"
+server-port = 3000

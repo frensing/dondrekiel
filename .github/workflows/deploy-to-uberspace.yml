@@ -29,5 +29,5 @@ jobs:
           remote_host: ${{ vars.SSH_HOST }}
           remote_user: ${{ vars.SSH_USERNAME }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/${{ vars.LOCATION }}
+          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/app.dondrekiel.de
           switches: -avrh --delete --exclude=".git" --exclude=".github"

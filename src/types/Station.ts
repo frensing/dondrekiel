@@ -1,6 +1,6 @@
 export interface Station {
   id: number;
-  name: string;
+  title: string;
   description: string;
   latitude: number;
   longitude: number;

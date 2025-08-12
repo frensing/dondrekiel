@@ -65,6 +65,8 @@ const MapView = () => {
     | Station
     | undefined;
 
+  const defaultZoom = 16;
+
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
     useGeolocated({
       positionOptions: {
@@ -79,7 +81,7 @@ const MapView = () => {
   // Handle selected station and initial user location
   useEffect(() => {
     if (!initialCenteringDone && !selectedStation && coords && mapRef.current) {
-      mapRef.current.setView([coords.latitude, coords.longitude], 15);
+      mapRef.current.setView([coords.latitude, coords.longitude], defaultZoom);
       setTimeout(() => setInitialCenteringDone(true), 1000);
     }
   }, [coords, initialCenteringDone, selectedStation]); // Only run once on mount
@@ -88,10 +90,8 @@ const MapView = () => {
     if (selectedStation && mapRef.current) {
       mapRef.current.setView(
         [selectedStation.latitude, selectedStation.longitude],
-        18,
+        defaultZoom,
       );
-    } else {
-      console.log("no station selected");
     }
   }, [selectedStation]);
 
@@ -111,7 +111,7 @@ const MapView = () => {
       return;
     }
 
-    mapRef.current?.setView([coords.latitude, coords.longitude], 18);
+    mapRef.current?.setView([coords.latitude, coords.longitude], defaultZoom);
   };
 
   return (
@@ -125,7 +125,7 @@ const MapView = () => {
             coords?.longitude ||
             DEFAULT_COORDINATES.longitude,
         ]}
-        zoom={16}
+        zoom={defaultZoom}
         scrollWheelZoom={true}
         className="w-full h-full"
         ref={mapRef}

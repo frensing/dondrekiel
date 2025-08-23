@@ -1,0 +1,27 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST https://app.dondrekiel.de/api/rpc/login
+Content-Type: application/json
+
+{
+  "name": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("auth_token_admin", response.body.token);
+%}
+
+### Get Messages
+GET https://app.dondrekiel.de/api/messages
+Authorization: Bearer {{auth_token_admin}}
+
+### Send Messages
+POST https://app.dondrekiel.de/api/messages
+Authorization: Bearer {{auth_token_admin}}
+Content-Type: application/json
+
+{
+  "message": "Test Nachricht an alle Teilnehmer",
+  "author": "Spielleitung",
+  "created_at": "2025-08-23T14:48:00.000Z"
+}

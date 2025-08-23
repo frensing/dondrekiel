@@ -5,12 +5,24 @@ import MessageList from "./components/MessageList.tsx";
 import MapView from "@/components/MapView.tsx";
 import { BottomNav } from "@/components/BottomNav.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
+import { useAuth } from "@/context/AuthContext.tsx";
+import LoginPage from "@/pages/LoginPage.tsx";
 
 function App() {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen">
+        <LoginPage />
+        <Toaster />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen">
       <main className="flex-1 overflow-y-auto pb-20">
-        {" "}
         {/* pb-16 accounts for BottomNav height */}
         <Routes>
           <Route path="/" element={<MapView />} />

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button.tsx";
 import { Locate } from "lucide-react";
 import { createStationMarker } from "@/components/StationMarker.tsx";
 import { fetchStations } from "@/lib/stations.ts";
+import { fetchTeams, type Team } from "@/lib/teams.ts";
+import { useAuth } from "@/context/AuthContext.tsx";
 
 const defaultIcon = L.icon({
   iconUrl: "/marker-icon.png",
@@ -27,6 +29,7 @@ L.Marker.prototype.options.icon = defaultIcon;
 const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: Berlin
 
 const MapView = () => {
+  const { teamName } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as
@@ -35,6 +38,9 @@ const MapView = () => {
 
   const [stations, setStations] = useState<Station[]>([]);
   const [stationsError, setStationsError] = useState<string | null>(null);
+
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [teamsError, setTeamsError] = useState<string | null>(null);
 
   const defaultZoom = 16;
 
@@ -80,6 +86,29 @@ const MapView = () => {
       toast(stationsError);
     }
   }, [stationsError]);
+
+  // Load teams list
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await fetchTeams();
+        if (isMounted) setTeams(data);
+      } catch {
+        if (isMounted) setTeamsError("Failed to load teams");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Notify if teams failed to load
+  useEffect(() => {
+    if (teamsError) {
+      toast(teamsError);
+    }
+  }, [teamsError]);
 
   useEffect(() => {
     if (selectedStation && mapRef.current) {
@@ -140,6 +169,23 @@ const MapView = () => {
             })}
           ></Marker>
         )}
+
+        {/* Team markers (other teams only) */}
+        {teams
+          .filter((t) => t.latitude != null && t.longitude != null)
+          .filter((t) => (teamName ? t.name?.toLowerCase() !== teamName : true))
+          .map((t) => (
+            <Marker
+              key={`team-${t.id}`}
+              position={[t.latitude as number, t.longitude as number]}
+              icon={L.divIcon({
+                className: "relative",
+                html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
+                iconSize: [18, 18],
+                iconAnchor: [9, 9],
+              })}
+            />
+          ))}
 
         {stations.map((s) => createStationMarker(s))}
       </MapContainer>

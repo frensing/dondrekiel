@@ -7,41 +7,31 @@ import {
 import { Station } from "@/types/Station.ts";
 import { useNavigate } from "react-router-dom";
 import { MapPin } from "lucide-react";
-
-// Example stations data - you should replace this with your actual data source
-const stations: Station[] = [
-  {
-    id: 1,
-    title: "Das verflixte Rad",
-    description: "Fahrräder",
-    latitude: 51.8456555569042,
-    longitude: 7.83885361939789,
-  },
-  {
-    id: 2,
-    title: "Pfadis",
-    description: "Bla",
-    latitude: 51.8423219532426,
-    longitude: 7.82743595630178,
-  },
-  {
-    id: 3,
-    title: "Aucom",
-    description: "Blub",
-    latitude: 51.8468066699671,
-    longitude: 7.84459694916815,
-  },
-  {
-    id: 4,
-    title: "Beweggründe",
-    description: "Sport",
-    latitude: 51.8429646849363,
-    longitude: 7.8254691891795,
-  },
-];
+import { useEffect, useState } from "react";
+import { fetchStations } from "@/lib/stations.ts";
 
 const StationList = () => {
   const navigate = useNavigate();
+  const [stations, setStations] = useState<Station[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await fetchStations();
+        if (isMounted) setStations(data);
+      } catch {
+        if (isMounted) setError("Failed to load stations");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleStationClick = (station: Station) => {
     // Navigate to map view with coordinates as state
@@ -51,6 +41,14 @@ const StationList = () => {
       },
     });
   };
+
+  if (loading) {
+    return <div className="p-4 text-sm text-gray-500">Loading stations…</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-sm text-red-600">{error}</div>;
+  }
 
   return (
     <div className="space-y-2 p-4">

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import { Locate } from "lucide-react";
 import { createStationMarker } from "@/components/StationMarker.tsx";
+import { fetchStations } from "@/lib/stations.ts";
 
 const defaultIcon = L.icon({
   iconUrl: "/marker-icon.png",
@@ -19,39 +20,6 @@ const defaultIcon = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
-
-const stations: Station[] = [
-  {
-    id: 1,
-    title: "Das verflixte Rad",
-    description: "Fahrräder",
-    latitude: 51.8456555569042,
-    longitude: 7.83885361939789,
-  },
-  {
-    id: 2,
-    title: "Pfadis",
-    description: "Bla",
-    latitude: 51.8423219532426,
-    longitude: 7.82743595630178,
-  },
-  {
-    id: 3,
-    title: "Aucom",
-    description: "Blub",
-    latitude: 51.8468066699671,
-    longitude: 7.84459694916815,
-  },
-  {
-    id: 4,
-    title: "Beweggründe",
-    description: "Sport",
-    latitude: 51.8429646849363,
-    longitude: 7.8254691891795,
-  },
-];
-
-console.log(stations);
 
 L.Marker.prototype.options.icon = defaultIcon;
 
@@ -64,6 +32,9 @@ const MapView = () => {
   const selectedStation = location.state?.selectedStation as
     | Station
     | undefined;
+
+  const [stations, setStations] = useState<Station[]>([]);
+  const [stationsError, setStationsError] = useState<string | null>(null);
 
   const defaultZoom = 16;
 
@@ -78,6 +49,23 @@ const MapView = () => {
     });
 
   const [initialCenteringDone, setInitialCenteringDone] = useState(false);
+
+  // Load stations list
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await fetchStations();
+        if (isMounted) setStations(data);
+      } catch {
+        if (isMounted) setStationsError("Failed to load stations");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Handle selected station and initial user location
   useEffect(() => {
     if (!initialCenteringDone && !selectedStation && coords && mapRef.current) {
@@ -85,6 +73,13 @@ const MapView = () => {
       setTimeout(() => setInitialCenteringDone(true), 1000);
     }
   }, [coords, initialCenteringDone, selectedStation]); // Only run once on mount
+
+  // Notify if stations failed to load
+  useEffect(() => {
+    if (stationsError) {
+      toast(stationsError);
+    }
+  }, [stationsError]);
 
   useEffect(() => {
     if (selectedStation && mapRef.current) {

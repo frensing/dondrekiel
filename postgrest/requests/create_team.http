@@ -1,0 +1,38 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST https://app.dondrekiel.de/api/rpc/login
+Content-Type: application/json
+
+{
+  "name": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("auth_token_admin", response.body.token);
+%}
+
+### Get Teams
+GET https://app.dondrekiel.de/api/users
+Authorization: Bearer {{auth_token_admin}}
+
+
+### Create Team
+POST https://app.dondrekiel.de/api/users
+Authorization: Bearer {{auth_token_admin}}
+Content-Type: application/json
+
+{
+  "name": "{{teamname}}",
+  "password": "{{teampassword}}"
+}
+
+### Create Initial Team entry
+###
+POST https://app.dondrekiel.de/api/teams
+Authorization: Bearer {{auth_token_admin}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "testteam"
+}

@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,webstorm
 
 postgrest/*.conf
+postgrest/requests/http-client.private.env.json
 
 ### Node ###
 # Logs

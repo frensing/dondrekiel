@@ -1,0 +1,27 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST https://app.dondrekiel.de/api/rpc/login
+Content-Type: application/json
+
+{
+  "name": "{{teamname}}",
+  "password": "{{teampassword}}"
+}
+
+> {%
+    client.global.set("auth_token_team", response.body.token);
+%}
+
+### Get Teams
+GET https://app.dondrekiel.de/api/teams
+
+
+###
+PATCH https://app.dondrekiel.de/api/teams
+Authorization: Bearer {{auth_token_team}}
+Content-Type: application/json
+
+{
+  "locationdate": "2025-08-23T14:48:00.000Z",
+  "latitude": 51.8,
+  "longitude": 7.83885361939789
+}

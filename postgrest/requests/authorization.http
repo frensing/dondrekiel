@@ -1,0 +1,19 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST https://app.dondrekiel.de/api/rpc/login
+Content-Type: application/json
+
+{
+  "name": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+###
+GET https://app.dondrekiel.de/api/users
+Authorization: Bearer {{auth_token}}
+
+###
+GET https://app.dondrekiel.de/api/users

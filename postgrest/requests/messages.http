@@ -25,3 +25,7 @@ Content-Type: application/json
   "author": "Spielleitung",
   "created_at": "2025-08-23T14:48:00.000Z"
 }
+
+### Delete Message
+DELETE https://app.dondrekiel.de/api/messages?id=eq.3
+Authorization: Bearer {{auth_token_admin}}

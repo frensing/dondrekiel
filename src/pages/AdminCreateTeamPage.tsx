@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { createTeam } from "@/lib/admin.ts";
 import { toast } from "sonner";
+import { Check } from "lucide-react";
 
 function generatePassword(len = 8): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789"; // avoid confusing chars
@@ -34,6 +35,7 @@ export default function AdminCreateTeamPage() {
     name: string;
     password: string;
   } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const disabled = useMemo(
     () => loading || teamName.trim().length === 0,
@@ -120,14 +122,42 @@ export default function AdminCreateTeamPage() {
                       <div className="text-xs break-all text-center text-gray-600">
                         {loginUrl}
                       </div>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => navigator.clipboard.writeText(loginUrl)}
-                        className="w-full"
-                      >
-                        Link kopieren
-                      </Button>
+                      <div className="w-full relative flex flex-col items-center">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          onClick={async () => {
+                            try {
+                              await navigator.clipboard.writeText(loginUrl);
+                              setCopied(true);
+                              // Auto-hide after 1.2s
+                              window.setTimeout(() => setCopied(false), 1200);
+                            } catch (e) {
+                              console.error(e);
+                              toast.error("Kopieren fehlgeschlagen");
+                            }
+                          }}
+                          className={`w-full transition-transform ${copied ? "scale-[0.98]" : ""}`}
+                        >
+                          {copied ? (
+                            <span className="inline-flex items-center gap-2">
+                              <Check className="w-4 h-4" /> Kopiert!
+                            </span>
+                          ) : (
+                            "Link kopieren"
+                          )}
+                        </Button>
+                        {/* Tiny popup above the button */}
+                        <div
+                          role="status"
+                          aria-live="polite"
+                          className={`pointer-events-none absolute -top-7 text-xs px-2 py-1 rounded-md shadow-sm bg-black/80 text-white transition-opacity translate-y-1 ${
+                            copied ? "opacity-100" : "opacity-0"
+                          }`}
+                        >
+                          Link in Zwischenablage
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

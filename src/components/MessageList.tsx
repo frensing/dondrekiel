@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card.tsx";
 import { useEffect, useRef, useState } from "react";
 import {
+  deleteMessage,
   fetchMessages,
   type Message as ApiMessage,
   sendMessage,

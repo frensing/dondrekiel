@@ -32,12 +32,13 @@ export default function AdminCreateTeamPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const normalized = teamName.trim().toLowerCase();
-    if (!normalized) return;
+    const displayName = teamName.trim();
+    if (!displayName) return;
+    const normalized = displayName.toLowerCase().replace(/\s+/g, "_");
     const password = generatePassword(8);
     setLoading(true);
     try {
-      await createTeam(normalized, password);
+      await createTeam(normalized, password, displayName);
       setCreated({ name: normalized, password });
       toast.success("Team erfolgreich angelegt");
     } catch (err) {
@@ -58,13 +59,13 @@ export default function AdminCreateTeamPage() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="team" className="text-sm">
-                Teamname
+                Team-Name
               </label>
               <Input
                 id="team"
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
-                placeholder="teamname"
+                placeholder="Team-Name"
                 required
               />
             </div>

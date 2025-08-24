@@ -3,6 +3,7 @@ import { api } from "@/lib/api.ts";
 export type Team = {
   id: number;
   name: string;
+  displayname: string;
   latitude: number | null;
   longitude: number | null;
   locationdate?: string | null;

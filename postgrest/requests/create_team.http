@@ -23,5 +23,6 @@ Content-Type: application/json
 
 {
   "name": "{{teamname}}",
-  "password": "{{teampassword}}"
+  "password": "{{teampassword}}",
+  "displayname": {{testdisplayname}}
 }

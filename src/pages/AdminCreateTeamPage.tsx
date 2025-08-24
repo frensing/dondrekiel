@@ -17,6 +17,16 @@ function generatePassword(len = 8): string {
   return Array.from(arr, (v) => alphabet[v % alphabet.length]).join("");
 }
 
+function base64UrlEncode(input: string): string {
+  const utf8 = new TextEncoder().encode(input);
+  let binary = "";
+  for (let i = 0; i < utf8.length; i++) {
+    binary += String.fromCharCode(utf8[i]);
+  }
+  const b64 = btoa(binary);
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
 export default function AdminCreateTeamPage() {
   const [teamName, setTeamName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -74,22 +84,55 @@ export default function AdminCreateTeamPage() {
             </Button>
           </form>
 
-          {created && (
-            <div className="mt-6 p-3 rounded-md bg-green-50 border border-green-200">
-              <div className="text-sm mb-2">Zugangsdaten:</div>
-              <div className="text-sm">
-                <span className="font-semibold">Team:</span> {created.name}
-              </div>
-              <div className="text-sm">
-                <span className="font-semibold">Passwort:</span>{" "}
-                {created.password}
-              </div>
-              <div className="text-xs text-gray-500 mt-2">
-                Bitte sicher aufbewahren. Das Passwort wird hier nur einmal
-                angezeigt.
-              </div>
-            </div>
-          )}
+          {created &&
+            (() => {
+              const payload = JSON.stringify({
+                n: created.name,
+                p: created.password,
+              });
+              const enc = base64UrlEncode(payload);
+              const loginUrl = `https://app.dondrekiel.de/?auto=1&enc=${enc}`;
+              const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(loginUrl)}`;
+              return (
+                <div className="mt-6 p-3 rounded-md bg-green-50 border border-green-200 space-y-3">
+                  <div className="text-sm">Zugangsdaten:</div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Team:</span> {created.name}
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-semibold">Passwort:</span>{" "}
+                    {created.password}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Bitte sicher aufbewahren. Das Passwort wird hier nur einmal
+                    angezeigt.
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-sm font-semibold mb-2">
+                      Direkt-Login per QR-Code
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                      <img
+                        src={qrUrl}
+                        alt="QR für Direkt-Login"
+                        className="w-48 h-48"
+                      />
+                      <div className="text-xs break-all text-center text-gray-600">
+                        {loginUrl}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => navigator.clipboard.writeText(loginUrl)}
+                        className="w-full"
+                      >
+                        Link kopieren
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
         </CardContent>
       </Card>
     </div>

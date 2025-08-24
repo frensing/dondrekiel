@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -11,10 +11,75 @@ import { Button } from "@/components/ui/button.tsx";
 import { useAuth } from "@/context/AuthContext.tsx";
 import { toast } from "sonner";
 
+function base64UrlDecode(input: string): string {
+  try {
+    const pad =
+      input.length % 4 === 0 ? "" : "=".repeat(4 - (input.length % 4));
+    const b64 = input.replace(/-/g, "+").replace(/_/g, "/") + pad;
+    return decodeURIComponent(
+      Array.prototype.map
+        .call(
+          atob(b64),
+          (c: string) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2),
+        )
+        .join(""),
+    );
+  } catch {
+    return "";
+  }
+}
+
 export default function LoginPage() {
+  const autoOnce = useRef(false);
   const { login, loading } = useAuth();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (autoOnce.current) return;
+    autoOnce.current = true;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const auto = params.get("auto");
+      const enc = params.get("enc");
+      let n: string | null = params.get("name");
+      let p: string | null = params.get("password");
+
+      if (auto && enc && !n && !p) {
+        // Prefer encoded payload if present
+        try {
+          const json = base64UrlDecode(enc);
+          const obj = JSON.parse(json) as {
+            n?: string;
+            p?: string;
+            name?: string;
+            password?: string;
+          };
+          n = obj.n ?? obj.name ?? null;
+          p = obj.p ?? obj.password ?? null;
+        } catch {
+          // ignore decode errors and fall back to plaintext params
+        }
+      }
+
+      if (auto && n && p) {
+        // also reflect values in inputs for transparency
+        setName(n.toLowerCase());
+        setPassword(p);
+        // trigger login
+        login(n, p)
+          .then(() => {
+            toast.success("Automatisch angemeldet");
+          })
+          .catch((err) => {
+            console.error(err);
+            toast.error("Auto-Login fehlgeschlagen");
+          });
+      }
+    } catch {
+      // ignore URL parse errors
+    }
+  }, [login]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Send, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext.tsx";
 import { toast } from "sonner";
+import { useMessageReadState } from "@/lib/unread.ts";
 
 function formatLocal24hTime(iso: string): string {
   const d = new Date(iso);
@@ -30,6 +31,7 @@ function formatLocal24hTime(iso: string): string {
 
 export default function MessageList() {
   const { isAdmin } = useAuth();
+  const { setLastReadNow } = useMessageReadState();
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState<ApiMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,6 +65,13 @@ export default function MessageList() {
       mounted = false;
     };
   }, []);
+
+  // Mark messages as read when viewing this page and when messages change
+  useEffect(() => {
+    if (!loading && !error) {
+      setLastReadNow();
+    }
+  }, [loading, error, messages.length, setLastReadNow]);
 
   useEffect(() => {
     if (messagesEndRef.current) {

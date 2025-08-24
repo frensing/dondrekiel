@@ -25,14 +25,3 @@ Content-Type: application/json
   "name": "{{teamname}}",
   "password": "{{teampassword}}"
 }
-
-### Create Initial Team entry
-###
-POST https://app.dondrekiel.de/api/teams
-Authorization: Bearer {{auth_token_admin}}
-Content-Type: application/json
-
-{
-  "id": 1,
-  "name": "testteam"
-}

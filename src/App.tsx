@@ -7,6 +7,22 @@ import { BottomNav } from "@/components/BottomNav.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 import { useAuth } from "@/context/AuthContext.tsx";
 import LoginPage from "@/pages/LoginPage.tsx";
+import AdminCreateTeamPage from "@/pages/AdminCreateTeamPage.tsx";
+
+function AdminOnly({ children }: { children: React.ReactNode }) {
+  const { isAdmin } = useAuth();
+  if (!isAdmin) {
+    return (
+      <div className="p-6">
+        <h1 className="text-lg font-semibold">403 – Zugriff verweigert</h1>
+        <p className="text-sm text-gray-600">
+          Diese Seite ist nur für Administratoren sichtbar.
+        </p>
+      </div>
+    );
+  }
+  return <>{children}</>;
+}
 
 function App() {
   const { isAuthenticated } = useAuth();
@@ -28,6 +44,14 @@ function App() {
           <Route path="/" element={<MapView />} />
           <Route path="/stationen" element={<StationList />} />
           <Route path="/nachrichten" element={<MessageList />} />
+          <Route
+            path="/admin/create-team"
+            element={
+              <AdminOnly>
+                <AdminCreateTeamPage />
+              </AdminOnly>
+            }
+          />
         </Routes>
         <Toaster />
       </main>

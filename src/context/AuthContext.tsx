@@ -12,6 +12,8 @@ interface AuthContextValue {
   token: string | null;
   teamName: string | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  role: string | null;
   loading: boolean;
   login: (name: string, password: string) => Promise<void>;
   logout: () => void;
@@ -61,16 +63,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTeamName(null);
   }, []);
 
+  function decodeRoleFromToken(t: string | null): string | null {
+    if (!t) return null;
+    try {
+      const base64Url = t.split(".")[1];
+      if (!base64Url) return null;
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(""),
+      );
+      const payload = JSON.parse(jsonPayload) as Record<string, unknown>;
+      const role = payload["role"] as string | undefined;
+      return role ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  const role = useMemo(() => decodeRoleFromToken(token), [token]);
+  const isAdmin = role === "dondrekiel_admin";
+
   const value = useMemo<AuthContextValue>(
     () => ({
       token,
       teamName,
       isAuthenticated: !!token,
+      isAdmin,
+      role,
       loading,
       login,
       logout,
     }),
-    [token, teamName, loading, login, logout],
+    [token, teamName, isAdmin, role, loading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

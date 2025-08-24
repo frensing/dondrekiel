@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { useAuth } from "@/context/AuthContext.tsx";
 import { toast } from "sonner";
+import { QrCode } from "lucide-react";
+import { Scanner } from "@yudiel/react-qr-scanner";
 
 function base64UrlDecode(input: string): string {
   try {
@@ -34,6 +36,8 @@ export default function LoginPage() {
   const { login, loading } = useAuth();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const handledScanRef = useRef(false);
 
   useEffect(() => {
     if (autoOnce.current) return;
@@ -92,6 +96,98 @@ export default function LoginPage() {
     }
   };
 
+  const handleScanText = async (text: string) => {
+    if (handledScanRef.current) return;
+    handledScanRef.current = true; // debounce multiple decodes
+    try {
+      let n: string | undefined;
+      let p: string | undefined;
+
+      // Try URL first
+      try {
+        const url = new URL(text);
+        const auto = url.searchParams.get("auto");
+        const enc = url.searchParams.get("enc");
+        if (auto) {
+          if (enc) {
+            const json = base64UrlDecode(enc);
+            try {
+              const obj = JSON.parse(json) as {
+                n?: string;
+                p?: string;
+                name?: string;
+                password?: string;
+              };
+              n = obj.n ?? obj.name ?? undefined;
+              p = obj.p ?? obj.password ?? undefined;
+            } catch {
+              // ignore
+            }
+          } else {
+            n = url.searchParams.get("name") ?? undefined;
+            p = url.searchParams.get("password") ?? undefined;
+          }
+        }
+      } catch {
+        // Not a URL; try query string
+        if (text.includes("=") && text.includes("&")) {
+          const params = new URLSearchParams(text);
+          const auto = params.get("auto");
+          if (auto) {
+            const enc = params.get("enc");
+            if (enc) {
+              const json = base64UrlDecode(enc);
+              try {
+                const obj = JSON.parse(json) as {
+                  n?: string;
+                  p?: string;
+                  name?: string;
+                  password?: string;
+                };
+                n = obj.n ?? obj.name ?? undefined;
+                p = obj.p ?? obj.password ?? undefined;
+              } catch {
+                /* ignore invalid JSON in enc */
+              }
+            } else {
+              n = params.get("name") ?? undefined;
+              p = params.get("password") ?? undefined;
+            }
+          }
+        } else if (text.trim().startsWith("{")) {
+          // Raw JSON payload
+          try {
+            const obj = JSON.parse(text) as {
+              n?: string;
+              p?: string;
+              name?: string;
+              password?: string;
+            };
+            n = obj.n ?? obj.name ?? undefined;
+            p = obj.p ?? obj.password ?? undefined;
+          } catch {
+            /* ignore invalid raw JSON */
+          }
+        }
+      }
+
+      if (n && p) {
+        setName(n.toLowerCase());
+        setPassword(p);
+        await login(n, p);
+        toast.success("Per QR angemeldet");
+        setScanning(false);
+      } else {
+        toast.error("QR-Code konnte nicht gelesen werden");
+        handledScanRef.current = false; // allow retry
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("QR-Login fehlgeschlagen");
+      handledScanRef.current = false;
+    }
+  };
+
   return (
     <div className="h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-sm">
@@ -128,12 +224,67 @@ export default function LoginPage() {
                 autoComplete="current-password"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Anmelden…" : "Anmelden"}
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1" disabled={loading}>
+                {loading ? "Anmelden…" : "Anmelden"}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  handledScanRef.current = false;
+                  setScanning(true);
+                }}
+                title="Login-QR-Code scannen"
+              >
+                <QrCode className="w-4 h-4 mr-2" />
+                QR scannen
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
+
+      {scanning && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <div className="font-semibold">QR-Code scannen</div>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setScanning(false)}
+                className="h-8 px-2"
+              >
+                Schließen
+              </Button>
+            </div>
+            <div className="p-3">
+              <div className="rounded-lg overflow-hidden">
+                <Scanner
+                  onScan={(detected) => {
+                    const text =
+                      Array.isArray(detected) && detected.length > 0
+                        ? detected[0].rawValue
+                        : undefined;
+                    if (!text) return;
+                    void handleScanText(text);
+                  }}
+                  onError={(error) => {
+                    console.error(error);
+                    toast.error("Kamera-Zugriff fehlgeschlagen");
+                  }}
+                  constraints={{ facingMode: "environment" }}
+                  scanDelay={300}
+                />
+              </div>
+              <div className="text-xs text-gray-600 mt-2">
+                Hinweis: Für das Scannen ist Kamerazugriff erforderlich.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -60,7 +60,7 @@ export default function LocationReporter() {
     void tick();
 
     // Then set interval every 2 minutes
-    intervalRef.current = window.setInterval(tick, 120000);
+    intervalRef.current = window.setInterval(tick, 30000);
 
     return () => {
       clear();

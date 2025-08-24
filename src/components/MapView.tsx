@@ -1,5 +1,5 @@
 import { useGeolocated } from "react-geolocated";
-import { MapContainer, Marker, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
@@ -29,7 +29,7 @@ L.Marker.prototype.options.icon = defaultIcon;
 const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: Berlin
 
 const MapView = () => {
-  const { teamName } = useAuth();
+  const { userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as
@@ -173,7 +173,7 @@ const MapView = () => {
         {/* Team markers (other teams only) */}
         {teams
           .filter((t) => t.latitude != null && t.longitude != null)
-          .filter((t) => (teamName ? t.name?.toLowerCase() !== teamName : true))
+          .filter((t) => (userId ? t.id !== parseInt(userId) : true))
           .map((t) => (
             <Marker
               key={`team-${t.id}`}
@@ -184,7 +184,13 @@ const MapView = () => {
                 iconSize: [18, 18],
                 iconAnchor: [9, 9],
               })}
-            />
+            >
+              <Popup>
+                <div className="p-2">
+                  <h3 className="font-bold">{t.name}</h3>
+                </div>
+              </Popup>
+            </Marker>
           ))}
 
         {stations.map((s) => createStationMarker(s))}

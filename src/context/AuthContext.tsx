@@ -1,5 +1,6 @@
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -13,6 +14,7 @@ interface AuthContextValue {
   teamName: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  userId: string | null;
   role: string | null;
   loading: boolean;
   login: (name: string, password: string) => Promise<void>;
@@ -21,7 +23,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem("auth_token"),
   );
@@ -63,7 +65,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setTeamName(null);
   }, []);
 
-  function decodeRoleFromToken(t: string | null): string | null {
+  function decodePayloadFromToken(
+    t: string | null,
+    payloadKey: string,
+  ): string | null {
     if (!t) return null;
     try {
       const base64Url = t.split(".")[1];
@@ -76,14 +81,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .join(""),
       );
       const payload = JSON.parse(jsonPayload) as Record<string, unknown>;
-      const role = payload["role"] as string | undefined;
-      return role ?? null;
+      const value = payload[payloadKey] as string | undefined;
+      return value ?? null;
     } catch {
       return null;
     }
   }
 
-  const role = useMemo(() => decodeRoleFromToken(token), [token]);
+  const role = useMemo(() => decodePayloadFromToken(token, "role"), [token]);
+  const userId = useMemo(() => decodePayloadFromToken(token, "id"), [token]);
   const isAdmin = role === "dondrekiel_admin";
 
   const value = useMemo<AuthContextValue>(
@@ -92,17 +98,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       teamName,
       isAuthenticated: !!token,
       isAdmin,
+      userId,
       role,
       loading,
       login,
       logout,
     }),
-    [token, teamName, isAdmin, role, loading, login, logout],
+    [token, teamName, isAdmin, userId, role, loading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) throw new Error("useAuth must be used within an AuthProvider");

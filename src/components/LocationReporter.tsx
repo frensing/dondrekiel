@@ -8,7 +8,7 @@ import { updateTeamLocation } from "@/lib/teams.ts";
  * Sends current location to the server every 2 minutes when coords are available.
  */
 export default function LocationReporter() {
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, userId } = useAuth();
 
   const { coords, isGeolocationAvailable, isGeolocationEnabled } =
     useGeolocated({
@@ -32,7 +32,7 @@ export default function LocationReporter() {
       }
     }
 
-    if (!isAuthenticated || !isTeamUser) {
+    if (!isAuthenticated || !isTeamUser || !userId) {
       clear();
       return;
     }
@@ -45,7 +45,11 @@ export default function LocationReporter() {
         // Avoid spamming if interval ticks too frequently somehow
         if (now - lastSentRef.current < 110000) return; // >= 110s
         lastSentRef.current = now;
-        await updateTeamLocation(coords.latitude, coords.longitude);
+        await updateTeamLocation(
+          parseInt(userId),
+          coords.latitude,
+          coords.longitude,
+        );
       } catch (e) {
         // Silently ignore to avoid spamming toasts
         console.debug("location update failed", e);
@@ -64,6 +68,7 @@ export default function LocationReporter() {
   }, [
     isAuthenticated,
     role,
+    userId,
     isGeolocationAvailable,
     isGeolocationEnabled,
     coords,

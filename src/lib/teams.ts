@@ -26,13 +26,18 @@ export async function fetchTeams(force = false): Promise<Team[]> {
 
 // PATCH /teams to update current team's location (requires team token)
 export async function updateTeamLocation(
+  id: number,
   latitude: number,
   longitude: number,
   locationdate: string = new Date().toISOString(),
 ): Promise<void> {
-  await api.patch("/teams", {
-    locationdate,
-    latitude,
-    longitude,
-  });
+  await api.patch(
+    "/teams",
+    {
+      locationdate,
+      latitude,
+      longitude,
+    },
+    { params: { id: `eq.${id}` } },
+  );
 }

@@ -23,3 +23,16 @@ export async function fetchTeams(force = false): Promise<Team[]> {
   cache = { data, expiresAt: now() + TTL };
   return data;
 }
+
+// PATCH /teams to update current team's location (requires team token)
+export async function updateTeamLocation(
+  latitude: number,
+  longitude: number,
+  locationdate: string = new Date().toISOString(),
+): Promise<void> {
+  await api.patch("/teams", {
+    locationdate,
+    latitude,
+    longitude,
+  });
+}

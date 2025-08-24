@@ -15,7 +15,7 @@ Content-Type: application/json
 GET https://app.dondrekiel.de/api/teams
 
 
-###
+### Update team location
 PATCH https://app.dondrekiel.de/api/teams
 Authorization: Bearer {{auth_token_team}}
 Content-Type: application/json

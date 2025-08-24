@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner.tsx";
 import { useAuth } from "@/context/AuthContext.tsx";
 import LoginPage from "@/pages/LoginPage.tsx";
 import AdminCreateTeamPage from "@/pages/AdminCreateTeamPage.tsx";
+import LocationReporter from "@/components/LocationReporter.tsx";
 
 function AdminOnly({ children }: { children: React.ReactNode }) {
   const { isAdmin } = useAuth();
@@ -38,6 +39,8 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen">
+      {/* Background location reporter for team users */}
+      <LocationReporter />
       <main className="flex-1 overflow-y-auto pb-20">
         {/* pb-16 accounts for BottomNav height */}
         <Routes>

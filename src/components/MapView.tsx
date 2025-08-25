@@ -171,7 +171,7 @@ const MapView = () => {
   };
 
   return (
-    <div ref={containerRef} className="h-full relative">
+    <div ref={containerRef} className="h-full relative z-0">
       <MapContainer
         center={[
           selectedStation?.latitude ||
@@ -240,8 +240,7 @@ const MapView = () => {
       <Button
         variant="secondary"
         size="icon"
-        className="absolute right-6 rounded-full shadow-lg z-[1000]"
-        style={{ bottom: "calc(env(safe-area-inset-bottom, 0) + 88px)" }}
+        className="absolute bottom-6 right-6 rounded-full shadow-lg z-[1000]"
         onClick={handleCenterLocation}
       >
         <Locate className="h-5 w-5" />

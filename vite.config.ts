@@ -24,6 +24,8 @@ export default defineConfig({
         short_name: "Dondrekiel",
         description: "Dondrekiel-App",
         theme_color: "#ed2727",
+        start_url: "/?source=pwa",
+        display: "standalone",
         icons: [
           {
             src: "/pwa-192x192.png",

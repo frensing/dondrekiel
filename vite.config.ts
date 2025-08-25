@@ -20,9 +20,9 @@ export default defineConfig({
       },
 
       manifest: {
-        name: "dondrekiel",
-        short_name: "dondrekiel",
-        description: "dondrekiel",
+        name: "Dondrekiel",
+        short_name: "Dondrekiel",
+        description: "Dondrekiel-App",
         theme_color: "#ed2727",
         icons: [
           {

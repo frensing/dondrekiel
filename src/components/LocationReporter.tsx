@@ -43,7 +43,7 @@ export default function LocationReporter() {
         if (!isGeolocationAvailable || !isGeolocationEnabled || !coords) return;
         const now = Date.now();
         // Avoid spamming if interval ticks too frequently somehow
-        if (now - lastSentRef.current < 110000) return; // >= 110s
+        if (now - lastSentRef.current < 30000) return; // >= 110s
         lastSentRef.current = now;
         await updateTeamLocation(
           parseInt(userId),
@@ -59,8 +59,8 @@ export default function LocationReporter() {
     // Send one immediately when coords available
     void tick();
 
-    // Then set interval every 2 minutes
-    intervalRef.current = window.setInterval(tick, 30000);
+    // Then set interval
+    intervalRef.current = window.setInterval(tick, 10000);
 
     return () => {
       clear();

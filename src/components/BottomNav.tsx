@@ -54,7 +54,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 bg-background border-t"
+      className="fixed bottom-0 left-0 right-0 bg-background border-t z-50"
       style={{
         bottom: "env(safe-area-inset-bottom, 0)",
         paddingBottom: "calc(env(safe-area-inset-bottom, 0) + 15px)", // extra touch target space

@@ -30,6 +30,7 @@ L.Marker.prototype.options.icon = defaultIcon;
 const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: Berlin
 
 const MapView = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const { userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
@@ -56,6 +57,36 @@ const MapView = () => {
     });
 
   const [initialCenteringDone, setInitialCenteringDone] = useState(false);
+
+  // Keep Leaflet map sized correctly when container size or orientation changes
+  useEffect(() => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el) return;
+
+    const invalidate = () => {
+      try {
+        map.invalidateSize();
+      } catch {
+        // ignore
+      }
+    };
+
+    const ro = new ResizeObserver(() => invalidate());
+    ro.observe(el);
+    window.addEventListener("orientationchange", invalidate);
+    window.addEventListener("resize", invalidate);
+
+    // initial invalidation after first paint
+    const id = window.setTimeout(invalidate, 50);
+
+    return () => {
+      window.clearTimeout(id);
+      ro.disconnect();
+      window.removeEventListener("orientationchange", invalidate);
+      window.removeEventListener("resize", invalidate);
+    };
+  }, []);
 
   // Load stations list
   useEffect(() => {
@@ -140,7 +171,7 @@ const MapView = () => {
   };
 
   return (
-    <div className="h-full relative">
+    <div ref={containerRef} className="h-full relative">
       <MapContainer
         center={[
           selectedStation?.latitude ||
@@ -209,7 +240,8 @@ const MapView = () => {
       <Button
         variant="secondary"
         size="icon"
-        className="absolute bottom-6 right-6 rounded-full shadow-lg z-[1000]"
+        className="absolute right-6 rounded-full shadow-lg z-[1000]"
+        style={{ bottom: "calc(env(safe-area-inset-bottom, 0) + 88px)" }}
         onClick={handleCenterLocation}
       >
         <Locate className="h-5 w-5" />

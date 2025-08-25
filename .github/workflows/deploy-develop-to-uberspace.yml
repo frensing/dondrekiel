@@ -1,0 +1,33 @@
+name: Deploy Dondrekiel App to Uberspace
+on:
+  push:
+    branches: [ develop ]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # checkout
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # build
+      - name: Install dependencies
+        run: npm install
+      - name: Run eslint
+        run: npm run lint
+      - name: Build app
+        run: npm run build
+
+      # deploy
+      - name: Deploy using Rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          path: dist/
+          remote_host: ${{ vars.SSH_HOST }}
+          remote_user: ${{ vars.SSH_USERNAME }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          remote_path: /var/www/virtual/${{ vars.SSH_USERNAME }}/app.dondrekiel.de
+          switches: -avrh --delete --exclude=".git" --exclude=".github"

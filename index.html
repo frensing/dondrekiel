@@ -13,6 +13,11 @@
     <link href="/favicon.svg" rel="icon" type="image/svg+xml"/>
     <link href="/favicon.ico" rel="shortcut icon"/>
     <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+    <link rel="manifest" href="/manifest.json">
+    <!-- iOS -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta content="Dondrekiel" name="apple-mobile-web-app-title"/>
     <meta content="#ed2727" media="(prefers-color-scheme: light)" name="theme-color">
     <meta content="#000000" media="(prefers-color-scheme: dark)" name="theme-color">
@@ -25,6 +30,49 @@
 </head>
 <body>
 <div id="root"></div>
+
+  <!-- PWA Install UI (Android/Chrome via beforeinstallprompt) -->
+  <div id="pwa-install" style="display:none; position:fixed; top:20px; right:20px; z-index:9999; box-shadow:0 2px 10px rgba(0,0,0,0.15); background:#ffffff; border-radius:8px; padding:10px 14px; max-width:320px;">
+    <button class="pwa-close" aria-label="Schließen" title="Schließen" style="position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:16px; line-height:1; cursor:pointer;">✕</button>
+    <button id="pwa-install-btn" aria-label="App installieren" style="padding:10px 14px; border-radius:8px; background:#0a84ff; color:#fff; border:none;">
+      App zur Startseite hinzufügen
+    </button>
+  </div>
+
+  <!-- iOS Install Hinweis (Safari: Teilen → "Zum Home‑Bildschirm") -->
+  <div id="pwa-install-ios" style="display:none; position:fixed; top:20px; left:20px; z-index:9998; background:rgba(0,0,0,0.85); color:#fff; padding:12px 16px; border-radius:8px; text-align:left; font-size:14px; max-width:320px;">
+    <button class="pwa-close" aria-label="Schließen" title="Schließen" style="position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:16px; line-height:1; color:#fff; cursor:pointer;">✕</button>
+    <div style="padding-right:28px;">
+      Öffnen Sie das Teilen‑Menü in Safari und wählen Sie „Zum Home‑Bildschirm“, um die App hinzuzufügen.
+    </div>
+  </div>
+
+    <!-- Service Worker Registrieren -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registriert:', reg.scope))
+          .catch(err => console.warn('SW Registrierung fehlgeschlagen:', err));
+      });
+    }
+  </script>
+
+  <!-- Einfacher Close‑Handler für die X‑Buttons -->
+  <script>
+    document.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!t) return;
+      if (t.classList && t.classList.contains('pwa-close')) {
+        const container = t.closest('#pwa-install, #pwa-install-ios');
+        if (container) container.style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- beforeinstall.js einbinden -->
+  <script src="/beforeinstall.js" defer></script>
+  <script src="/push-subscribe.js" defer></script>
 <script src="/src/main.tsx" type="module"></script>
 </body>
 </html>

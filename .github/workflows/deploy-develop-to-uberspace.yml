@@ -1,4 +1,4 @@
-name: Deploy Dondrekiel App to Uberspace
+name: Deploy branch DEVELOP Dondrekiel App to Uberspace
 on:
   push:
     branches: [ develop ]

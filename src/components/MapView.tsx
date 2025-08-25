@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button.tsx";
 import { Locate } from "lucide-react";
 import { createStationMarker } from "@/components/StationMarker.tsx";
 import { fetchStations } from "@/lib/stations.ts";
-import { fetchTeams, type Team } from "@/lib/teams.ts";
+import { fetchTeams } from "@/lib/teams.ts";
 import { useAuth } from "@/context/AuthContext.tsx";
+import { Team } from "@/types/Team";
 
 const defaultIcon = L.icon({
   iconUrl: "/marker-icon.png",

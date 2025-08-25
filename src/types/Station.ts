@@ -4,4 +4,5 @@ export interface Station {
   description: string;
   latitude: number;
   longitude: number;
+  marker: string;
 }

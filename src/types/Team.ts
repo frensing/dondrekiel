@@ -1,8 +1,8 @@
 export interface Team {
   id: number;
   name: string;
-  displayName: string;
-  locationDate: number | null;
+  displayname: string;
   latitude: number | null;
   longitude: number | null;
+  locationdate?: string | null;
 }

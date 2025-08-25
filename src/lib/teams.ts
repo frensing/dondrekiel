@@ -1,13 +1,5 @@
 import { api } from "@/lib/api.ts";
-
-export type Team = {
-  id: number;
-  name: string;
-  displayname: string;
-  latitude: number | null;
-  longitude: number | null;
-  locationdate?: string | null;
-};
+import { Team } from "@/types/Team";
 
 // Simple caching: teams change occasionally; cache for 30s in memory
 let cache: { data: Team[]; expiresAt: number } | null = null;

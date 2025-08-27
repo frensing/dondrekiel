@@ -119,19 +119,30 @@ const MapView = () => {
     }
   }, [stationsError]);
 
-  // Load teams list
+  // Load teams list and refresh periodically (every 20s)
   useEffect(() => {
     let isMounted = true;
-    (async () => {
+
+    async function load(force = false) {
       try {
-        const data = await fetchTeams();
+        const data = await fetchTeams(force);
         if (isMounted) setTeams(data);
       } catch {
         if (isMounted) setTeamsError("Failed to load teams");
       }
-    })();
+    }
+
+    // Force load immediately when opening MapView to get freshest locations
+    void load(true);
+
+    // Periodic refresh every 20 seconds, forcing cache bypass
+    const id = window.setInterval(() => {
+      void load(true);
+    }, 20000);
+
     return () => {
       isMounted = false;
+      window.clearInterval(id);
     };
   }, []);
 

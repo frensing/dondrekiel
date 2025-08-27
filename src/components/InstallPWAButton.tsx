@@ -28,13 +28,6 @@ function useIsStandalone() {
   return standalone;
 }
 
-// minimal type for the event
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform?: string }>;
-  readonly platforms: string[];
-}
-
 /**
  * Shows a button when the PWA can be installed (Chrome/Edge/Android). On click, triggers the install prompt.
  * It hides itself when the app is already installed or after successful installation.
@@ -50,17 +43,18 @@ export default function InstallPWAButton({
 
   useEffect(() => {
     function onBeforeInstallPrompt(e: Event) {
-      const ev = e as BeforeInstallPromptEvent;
-      // Prevent the automatic mini-banner, but keep the event so we can prompt later
-      ev.preventDefault?.();
-      deferredPromptRef.current = ev;
+      // Prevent the mini-infobar on mobile
+      e.preventDefault?.();
+      deferredPromptRef.current = e as BeforeInstallPromptEvent;
       setCanInstall(true);
     }
 
     function onAppInstalled() {
-      // App installed -> hide button
       deferredPromptRef.current = null;
       setCanInstall(false);
+      toast.success(
+        "App installiert – Du findest sie jetzt auf deinem Home-Bildschirm.",
+      );
     }
 
     window.addEventListener(
@@ -85,25 +79,22 @@ export default function InstallPWAButton({
   if (!visible) return null;
 
   const onClick = async () => {
-    const ev = deferredPromptRef.current;
-    if (!ev) return;
     try {
-      await ev.prompt();
-      const choice = await ev.userChoice;
+      const dp = deferredPromptRef.current;
+      if (!dp) return;
+      dp.prompt();
+      const choice = await dp.userChoice;
       if (choice.outcome === "accepted") {
-        setCanInstall(false);
+        toast.success("Installation gestartet");
       } else {
-        // falls abgelehnt: optional UI weiter anzeigen oder kurz ausblenden
-        setCanInstall(false);
-        setTimeout(() => {
-          // Benutzer kann erneut zum Installieren aufgefordert werden (optional)
-          // setCanInstall(true);
-        }, 30000);
+        toast("Installation abgebrochen");
       }
-    } catch (err) {
-      console.error("Install prompt failed", err);
-    } finally {
+      // After the prompt, clear the saved event. Some browsers allow only once.
       deferredPromptRef.current = null;
+      setCanInstall(false);
+    } catch (e) {
+      console.error(e);
+      toast.error("Installation nicht möglich");
     }
   };
 

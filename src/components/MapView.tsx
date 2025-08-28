@@ -31,7 +31,7 @@ const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: 
 
 const MapView = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { userId } = useAuth();
+  const { isAuthenticated, role, userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as
@@ -181,6 +181,7 @@ const MapView = () => {
     mapRef.current?.setView([coords.latitude, coords.longitude], defaultZoom);
   };
 
+  
   return (
     <div ref={containerRef} className="h-full relative z-0">
       <MapContainer
@@ -233,9 +234,14 @@ const MapView = () => {
         >
           <Popup>
             <div className="p-2">
-          <h3 className="font-bold">{t.name}</h3>
+            {(role === "dondrekiel_admin" || role === "dondrekiel_station") && (
+              <>
+                <h3 className="font-bold">{t.name}</h3>
+                <div className="text-xs text-gray-500">Team ID: {t.id}</div>
+              </>
+            )}
           <p className="text-sm text-gray-600">
-            Position: 
+            Position:&nbsp; 
             {t.latitude != null ? t.latitude.toFixed(4) : "?"}, 
             {t.longitude != null ? t.longitude.toFixed(4) : "?"}
           </p>

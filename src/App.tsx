@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/BottomNav.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 import { useAuth } from "@/context/AuthContext.tsx";
 import LoginPage from "@/pages/LoginPage.tsx";
+import LogoutPage from "@/pages/LogoutPage.tsx";
 import AdminCreateTeamPage from "@/pages/AdminCreateTeamPage.tsx";
 import LocationReporter from "@/components/LocationReporter.tsx";
 
@@ -47,6 +48,7 @@ function App() {
           <Route path="/" element={<MapView />} />
           <Route path="/stationen" element={<StationList />} />
           <Route path="/nachrichten" element={<MessageList />} />
+          <Route path="/logout" element={<LogoutPage />} />
           <Route
             path="/admin/create-team"
             element={

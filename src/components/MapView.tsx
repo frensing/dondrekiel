@@ -155,18 +155,21 @@ const MapView = () => {
         ref={mapRef}
         attributionControl={false}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
+        {/* OSM France "Forte" Layer */}
+        <TileLayer
+          url="https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
         {/* User location marker */}
         {coords && (
           <Marker
-            position={[coords.latitude, coords.longitude]}
-            icon={L.divIcon({
-              className: "relative",
-              html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
-              iconSize: [20, 20],
-              iconAnchor: [10, 10],
-            })}
+        position={[coords.latitude, coords.longitude]}
+        icon={L.divIcon({
+          className: "relative",
+          html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        })}
           ></Marker>
         )}
 
@@ -175,22 +178,27 @@ const MapView = () => {
           .filter((t) => t.latitude != null && t.longitude != null)
           .filter((t) => (userId ? t.id !== parseInt(userId) : true))
           .map((t) => (
-            <Marker
-              key={`team-${t.id}`}
-              position={[t.latitude as number, t.longitude as number]}
-              icon={L.divIcon({
-                className: "relative",
-                html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
-              })}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold">{t.name}</h3>
-                </div>
-              </Popup>
-            </Marker>
+        <Marker
+          key={`team-${t.id}`}
+          position={[t.latitude as number, t.longitude as number]}
+          icon={L.divIcon({
+            className: "relative",
+            html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          })}
+        >
+          <Popup>
+            <div className="p-2">
+          <h3 className="font-bold">{t.name}</h3>
+          <p className="text-sm text-gray-600">
+            Position: 
+            {t.latitude != null ? t.latitude.toFixed(4) : "?"}, 
+            {t.longitude != null ? t.longitude.toFixed(4) : "?"}
+          </p>
+            </div>
+          </Popup>
+        </Marker>
           ))}
 
         {stations.map((s) => createStationMarker(s))}

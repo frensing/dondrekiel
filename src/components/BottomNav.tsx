@@ -72,29 +72,7 @@ export function BottomNav() {
         });
         // Push-Benachrichtigung bei neuer Nachricht
         if (hasNewMessage && location.pathname !== "/nachrichten") {
-          // Notification Permission prüfen
-          if ("Notification" in window) {
-            if (Notification.permission === "granted") {
               notify("Neue Nachricht", { body: "Du hast eine neue Nachricht erhalten.", icon: "/icon-192.png" });
-
-              new Notification("Neue Nachricht", { 
-                body: "Du hast eine neue Nachricht erhalten.", 
-                icon: "/icon-192.png",
-                tag: "new-message" // Verhindert mehrfache Notifications
-              });
-            } else if (Notification.permission === "default") {
-              // Optional: Permission anfragen
-              Notification.requestPermission().then(permission => {
-                if (permission === "granted" && hasNewMessage) {
-                  new Notification("Neue Nachricht", { 
-                    body: "Du hast eine neue Nachricht erhalten.", 
-                    icon: "/icon-192.png",
-                    tag: "new-message"
-                  });
-                }
-              });
-            }
-          }
         }
 
         // State aktualisieren

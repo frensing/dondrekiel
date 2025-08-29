@@ -70,6 +70,10 @@ export function BottomNav() {
           currentLastRead,
           hasNewMessage
         });
+        // Push-Benachrichtigung bei neuer Nachricht
+        if (hasNewMessage && location.pathname !== "/nachrichten") {
+              notify("Neue Nachricht", { body: "Du hast eine neue Nachricht erhalten.", icon: "/icon-192.png" });
+        }
 
         // State aktualisieren
         latestTsRef.current = newestTimestamp;
@@ -81,10 +85,6 @@ export function BottomNav() {
                                 newestTimestamp > 0 && 
                                 location.pathname !== "/nachrichten";
         
-        // Push-Benachrichtigung bei neuer Nachricht
-        if (shouldShowBadge && location.pathname !== "/nachrichten") {
-              notify("Neue Nachricht", { body: "Du hast eine neue Nachricht erhalten.", icon: "/icon-192.png" });
-        }
         setHasUnread(shouldShowBadge);
 
         console.log("Polling-Ergebnis:", {

@@ -31,6 +31,21 @@
 <body>
 <div id="root"></div>
 
+  <!-- PWA Install UI (Android/Chrome via beforeinstallprompt) -->
+  <div id="pwa-install" style="display:none; position:fixed; top:20px; right:20px; z-index:9999; box-shadow:0 2px 10px rgba(0,0,0,0.15); background:#ffffff; border-radius:8px; padding:10px 14px; max-width:320px;">
+    <button class="pwa-close" aria-label="Schließen" title="Schließen" style="position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:16px; line-height:1; cursor:pointer;">✕</button>
+    <button id="pwa-install-btn" aria-label="App installieren" style="padding:10px 14px; border-radius:8px; background:#0a84ff; color:#fff; border:none;">
+      App zur Startseite hinzufügen
+    </button>
+  </div>
+
+  <!-- iOS Install Hinweis (Safari: Teilen → "Zum Home‑Bildschirm") -->
+  <div id="pwa-install-ios" style="display:none; position:fixed; top:20px; left:20px; z-index:9998; background:rgba(0,0,0,0.85); color:#fff; padding:12px 16px; border-radius:8px; text-align:left; font-size:14px; max-width:320px;">
+    <button class="pwa-close" aria-label="Schließen" title="Schließen" style="position:absolute; top:8px; right:8px; background:transparent; border:none; font-size:16px; line-height:1; color:#fff; cursor:pointer;">✕</button>
+    <div style="padding-right:28px;">
+      Öffnen Sie das Teilen‑Menü in Safari und wählen Sie „Zum Home‑Bildschirm“, um die App hinzuzufügen.
+    </div>
+  </div>
 
 <script src="/src/main.tsx" type="module"></script>
 </body>

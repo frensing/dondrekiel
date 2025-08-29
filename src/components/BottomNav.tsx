@@ -60,8 +60,8 @@ export function BottomNav() {
             return t > accT ? m : acc;
         }, undefined);
 
-        var newestTimestamp = 0;
-        var newestMessage = "";
+        let newestTimestamp = 0;
+        let newestMessage = "";
         if (newest) {
           newestTimestamp = newest.created_at ? new Date(newest.created_at).getTime() : 0;
           newestMessage = newest.message;

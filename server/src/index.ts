@@ -89,11 +89,12 @@ async function deleteSubscription(endpoint: string): Promise<void> {
       params: { endpoint: `eq.${endpoint}` },
     });
     console.log(`[push-sender] Deleted stale subscription: ${endpoint}`);
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const err = e as { response?: { status?: number }; message?: string };
     console.warn(
       "[push-sender] Failed to delete stale subscription",
       endpoint,
-      e?.response?.status || e?.message,
+      err.response?.status || err.message,
     );
   }
 }
@@ -111,15 +112,20 @@ async function sendToSubscription(
   } as webpush.PushSubscription;
   try {
     await webpush.sendNotification(subscription, JSON.stringify(payload));
-  } catch (e: any) {
-    const statusCode = e?.statusCode || e?.response?.statusCode;
+  } catch (e: unknown) {
+    const err = e as {
+      statusCode?: number;
+      response?: { statusCode?: number };
+      message?: string;
+    };
+    const statusCode = err?.statusCode || err?.response?.statusCode;
     if (statusCode === 404 || statusCode === 410) {
       await deleteSubscription(sub.endpoint);
     } else {
       console.warn(
         "[push-sender] sendNotification error",
         statusCode,
-        e?.message || e,
+        err?.message || err,
       );
     }
   }
@@ -170,21 +176,30 @@ function startPolling(): void {
     })
     .then(({ data }) => {
       const id =
-        Array.isArray(data) && (data[0] as any)?.id
-          ? Number((data[0] as any).id)
+        Array.isArray(data) &&
+        typeof (data[0] as Pick<DbMessage, "id"> | undefined)?.id === "number"
+          ? Number((data[0] as Pick<DbMessage, "id">).id)
           : 0;
       lastMessageId = id;
       console.log(`[push-sender] Initialized lastMessageId=${lastMessageId}`);
     })
-    .catch(() => {})
+    .catch((e: unknown) => {
+      // Ignore initialization failure; will proceed with polling regardless
+      const err = e as { message?: string };
+      console.warn(
+        "[push-sender] Failed to initialize lastMessageId:",
+        err?.message || err,
+      );
+    })
     .finally(() => {
       const tick = async () => {
         try {
           await processNewMessages();
-        } catch (e: any) {
+        } catch (e: unknown) {
+          const err = e as { message?: string };
           console.warn(
             "[push-sender] Polling iteration failed:",
-            e?.message || e,
+            err?.message || err,
           );
         } finally {
           timer = setTimeout(

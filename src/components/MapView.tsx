@@ -31,7 +31,7 @@ const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: 
 
 const MapView = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { userId } = useAuth();
+  const { role, userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as
@@ -236,7 +236,7 @@ const MapView = () => {
                 className: "relative",
                 html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
                 iconSize: [18, 18],
-                iconAnchor: [9, 9,
+                iconAnchor: [9, 9],
               })}
             >
               <Popup>

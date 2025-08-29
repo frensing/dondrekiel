@@ -53,11 +53,20 @@ export function BottomNav() {
         if (!Array.isArray(msgs) || msgs.length === 0) return;
         if (cancelled) return;
 
-        // WICHTIG: Neueste Nachricht bestimmen (größter created_at)
-        const newestTimestamp = msgs.reduce<number>((max, m) => {
+        const newest = msgs.reduce<typeof msgs[0] | undefined>((acc, m) => {
           const t = new Date(m?.created_at ?? 0).getTime();
-          return Number.isFinite(t) && t > max ? t : max;
-        }, 0);
+          if (!acc) return m;
+            const accT = new Date(acc.created_at ?? 0).getTime();
+            return t > accT ? m : acc;
+        }, undefined);
+
+        var newestTimestamp = 0;
+        var newestMessage = "";
+        if (newest) {
+          newestTimestamp = newest.created_at ? new Date(newest.created_at).getTime() : 0;
+          newestMessage = newest.message;
+        }; 
+
 
         const previousTimestamp = latestTsRef.current;
         const currentLastRead = lastReadRef.current;
@@ -72,7 +81,7 @@ export function BottomNav() {
         });
         // Push-Benachrichtigung bei neuer Nachricht
         if (hasNewMessage && location.pathname !== "/nachrichten") {
-              notify("Neue Nachricht", { body: "Du hast eine neue Nachricht erhalten.", icon: "/icon-192.png" });
+              notify("Neue Nachricht von Dondrekiel", { body: "Du hast eine neue Nachricht erhalten: " + newestMessage, icon: "/icon-192.png" });
         }
 
         // State aktualisieren

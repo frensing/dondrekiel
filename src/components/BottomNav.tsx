@@ -2,6 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { Flag, Map, MessageCircle } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { fetchMessages } from "@/lib/messages.ts";
+import { notify } from "@/lib/notifications.ts";
 import { useAuth } from "@/context/AuthContext.tsx";
 import { getLastReadAt, setLastReadNow } from "@/lib/unread.ts";
 
@@ -74,6 +75,8 @@ export function BottomNav() {
           // Notification Permission prüfen
           if ("Notification" in window) {
             if (Notification.permission === "granted") {
+              notify("Neue Nachricht", { body: "Du hast eine neue Nachricht erhalten.", icon: "/icon-192.png" });
+
               new Notification("Neue Nachricht", { 
                 body: "Du hast eine neue Nachricht erhalten.", 
                 icon: "/icon-192.png",

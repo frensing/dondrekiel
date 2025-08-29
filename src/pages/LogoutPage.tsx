@@ -15,15 +15,24 @@ export default function Logout() {
         await fetch("/logout", {
           method: "GET", // oder "GET" je nach Server-Implementierung
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: {  },
         });
       } catch (e) {
         console.warn("Server logout failed:", e);
       }
 
       // Clientseitig Tokens / Session löschen (anpassen auf eure Speicherung)
-      try { localStorage.removeItem("auth_token"); } catch {}
-      try { sessionStorage.removeItem("auth_token"); } catch {}
+      try {
+        localStorage.removeItem("auth_token");
+      } catch (e) {
+        void e; // no-op
+      }
+
+      try {
+        sessionStorage.removeItem("auth_token");
+      } catch (e) {
+        void e; // no-op
+      }
       // optional: weitere Aufräumarbeiten, z.B. Push unsubscribe, SW messages, Zustand resetten
 
       // Weiterleitung zum Login (ersetzt aktuellen Eintrag)

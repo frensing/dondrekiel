@@ -31,7 +31,7 @@ const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: 
 
 const MapView = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const { isAuthenticated, role, userId } = useAuth();
+  const { role, userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as

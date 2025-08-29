@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext.tsx";
 import { toast } from "sonner";
 import { QrCode } from "lucide-react";
 import { Scanner } from "@yudiel/react-qr-scanner";
+import InstallPWAButton from "@/components/InstallPWAButton.tsx";
 
 function base64UrlDecode(input: string): string {
   try {
@@ -240,6 +241,11 @@ export default function LoginPage() {
                 <QrCode className="w-4 h-4 mr-2" />
                 QR scannen
               </Button>
+            </div>
+
+            {/* Offer app installation if available */}
+            <div className="flex justify-center pt-1">
+              <InstallPWAButton />
             </div>
           </form>
         </CardContent>

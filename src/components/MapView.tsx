@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button.tsx";
 import { Locate } from "lucide-react";
 import { createStationMarker } from "@/components/StationMarker.tsx";
 import { fetchStations } from "@/lib/stations.ts";
-import { fetchTeams, type Team } from "@/lib/teams.ts";
+import { fetchTeams } from "@/lib/teams.ts";
 import { useAuth } from "@/context/AuthContext.tsx";
+import { Team } from "@/types/Team";
 
 const defaultIcon = L.icon({
   iconUrl: "/marker-icon.png",
@@ -29,7 +30,8 @@ L.Marker.prototype.options.icon = defaultIcon;
 const DEFAULT_COORDINATES = { latitude: 51.844, longitude: 7.827 }; // Example: Berlin
 
 const MapView = () => {
-  const { userId } = useAuth();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { isAuthenticated, role, userId } = useAuth();
   const location = useLocation();
   const mapRef = useRef<L.Map | null>(null);
   const selectedStation = location.state?.selectedStation as
@@ -55,6 +57,36 @@ const MapView = () => {
     });
 
   const [initialCenteringDone, setInitialCenteringDone] = useState(false);
+
+  // Keep Leaflet map sized correctly when container size or orientation changes
+  useEffect(() => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el) return;
+
+    const invalidate = () => {
+      try {
+        map.invalidateSize();
+      } catch {
+        // ignore
+      }
+    };
+
+    const ro = new ResizeObserver(() => invalidate());
+    ro.observe(el);
+    window.addEventListener("orientationchange", invalidate);
+    window.addEventListener("resize", invalidate);
+
+    // initial invalidation after first paint
+    const id = window.setTimeout(invalidate, 50);
+
+    return () => {
+      window.clearTimeout(id);
+      ro.disconnect();
+      window.removeEventListener("orientationchange", invalidate);
+      window.removeEventListener("resize", invalidate);
+    };
+  }, []);
 
   // Load stations list
   useEffect(() => {
@@ -87,19 +119,30 @@ const MapView = () => {
     }
   }, [stationsError]);
 
-  // Load teams list
+  // Load teams list and refresh periodically (every 20s)
   useEffect(() => {
     let isMounted = true;
-    (async () => {
+
+    async function load(force = false) {
       try {
-        const data = await fetchTeams();
+        const data = await fetchTeams(force);
         if (isMounted) setTeams(data);
       } catch {
         if (isMounted) setTeamsError("Failed to load teams");
       }
-    })();
+    }
+
+    // Force load immediately when opening MapView to get freshest locations
+    void load(true);
+
+    // Periodic refresh every 20 seconds, forcing cache bypass
+    const id = window.setInterval(() => {
+      void load(true);
+    }, 20000);
+
     return () => {
       isMounted = false;
+      window.clearInterval(id);
     };
   }, []);
 
@@ -138,8 +181,9 @@ const MapView = () => {
     mapRef.current?.setView([coords.latitude, coords.longitude], defaultZoom);
   };
 
+  
   return (
-    <div className="h-full relative">
+    <div ref={containerRef} className="h-full relative z-0">
       <MapContainer
         center={[
           selectedStation?.latitude ||
@@ -155,18 +199,21 @@ const MapView = () => {
         ref={mapRef}
         attributionControl={false}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
+        {/* OSM France "Forte" Layer */}
+        <TileLayer
+          url="https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
         {/* User location marker */}
         {coords && (
           <Marker
-            position={[coords.latitude, coords.longitude]}
-            icon={L.divIcon({
-              className: "relative",
-              html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
-              iconSize: [20, 20],
-              iconAnchor: [10, 10],
-            })}
+        position={[coords.latitude, coords.longitude]}
+        icon={L.divIcon({
+          className: "relative",
+          html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
+          iconSize: [20, 20],
+          iconAnchor: [10, 10],
+        })}
           ></Marker>
         )}
 
@@ -175,22 +222,32 @@ const MapView = () => {
           .filter((t) => t.latitude != null && t.longitude != null)
           .filter((t) => (userId ? t.id !== parseInt(userId) : true))
           .map((t) => (
-            <Marker
-              key={`team-${t.id}`}
-              position={[t.latitude as number, t.longitude as number]}
-              icon={L.divIcon({
-                className: "relative",
-                html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
-                iconSize: [18, 18],
-                iconAnchor: [9, 9],
-              })}
-            >
-              <Popup>
-                <div className="p-2">
-                  <h3 className="font-bold">{t.name}</h3>
-                </div>
-              </Popup>
-            </Marker>
+        <Marker
+          key={`team-${t.id}`}
+          position={[t.latitude as number, t.longitude as number]}
+          icon={L.divIcon({
+            className: "relative",
+            html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          })}
+        >
+          <Popup>
+            <div className="p-2">
+            {(role === "dondrekiel_admin" || role === "dondrekiel_station") && (
+              <>
+                <h3 className="font-bold">{t.name}</h3>
+                <div className="text-xs text-gray-500">Team ID: {t.id}</div>
+              </>
+            )}
+          <p className="text-sm text-gray-600">
+            Position:&nbsp; 
+            {t.latitude != null ? t.latitude.toFixed(4) : "?"}, 
+            {t.longitude != null ? t.longitude.toFixed(4) : "?"}
+          </p>
+            </div>
+          </Popup>
+        </Marker>
           ))}
 
         {stations.map((s) => createStationMarker(s))}

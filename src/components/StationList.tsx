@@ -93,7 +93,14 @@ const StationList = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <p className="text-sm text-gray-600">{station.description}</p>
+                        {station.description && (
+            <p className="text-sm mt-1 whitespace-pre-wrap">
+                <div className="prose" 
+                  dangerouslySetInnerHTML={{ __html: station.description }}
+                />
+            </p>
+          )}
+
             <div className="flex justify-end mt-2">
               <span className="text-xs text-gray-500">
                 {station.latitude.toFixed(4)}, {station.longitude.toFixed(4)}

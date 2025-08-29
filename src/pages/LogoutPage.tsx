@@ -36,7 +36,7 @@ export default function Logout() {
       // optional: weitere Aufräumarbeiten, z.B. Push unsubscribe, SW messages, Zustand resetten
 
       // Weiterleitung zum Login (ersetzt aktuellen Eintrag)
-      window.location.href = "/login";
+      window.location.href = "/";
     })();
   }, [navigate]);
 

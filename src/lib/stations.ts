@@ -52,7 +52,7 @@ export async function fetchStations(forceRefresh = false): Promise<Station[]> {
   }
 
   // Fetch from API
-  const { data } = await api.get<Station[]>("/stations");
+  const { data } = await api.get<Station[]>("/stations?order=sort_order.asc");
 
   // Update caches
   memoryCache = { data, expiresAt: now() + CACHE_TTL_MS };

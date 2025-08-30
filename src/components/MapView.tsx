@@ -214,7 +214,19 @@ const MapView = () => {
           iconSize: [20, 20],
           iconAnchor: [10, 10],
         })}
-          ></Marker>
+          >
+          <Popup>
+            <div className="p-2">
+              <h3 className="font-bold">Hier seid ihr!</h3>
+              <p className="text-sm text-gray-600">
+                Position:&nbsp; 
+                {coords.latitude != null ? coords.latitude.toFixed(4) : "?"}, 
+                {coords.longitude != null ? coords.longitude.toFixed(4) : "?"}
+              </p>
+            </div>
+          </Popup>
+
+          </Marker>
         )}
 
         {/* Team markers (other teams only) */}
@@ -238,6 +250,13 @@ const MapView = () => {
               <>
                 <h3 className="font-bold">{t.name}</h3>
                 <div className="text-xs text-gray-500">Team ID: {t.id}</div>
+                <div className="text-xs text-gray-500">Zeit: {t.locationdate != null ? t.locationdate : "unbekannt"}</div>
+
+              </>
+            )}
+            {(role === "team_user") && (
+              <>
+                <h3 className="font-bold">Hier ist ein anderes Team!</h3>
               </>
             )}
           <p className="text-sm text-gray-600">

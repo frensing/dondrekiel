@@ -5,4 +5,5 @@ export interface Station {
   latitude: number;
   longitude: number;
   marker: string;
+  sort_order: number;
 }

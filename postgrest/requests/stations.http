@@ -1,4 +1,4 @@
 ### GET request to example server
-GET https://app.dondrekiel.de/api/stations
+GET https://app.dondrekiel.de/api/stations?order=sort_order.asc
 
 ###

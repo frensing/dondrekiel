@@ -1,56 +1,130 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Flag, Map, MessageCircle } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { fetchMessages } from "@/lib/messages.ts";
+import { notify } from "@/lib/notifications.ts";
 import { useAuth } from "@/context/AuthContext.tsx";
-import { getLastReadAt } from "@/lib/unread.ts";
+import { getLastReadAt, setLastReadNow } from "@/lib/unread.ts";
 
 export function BottomNav() {
   const { teamName } = useAuth();
   const location = useLocation();
-  const baseLinkClasses = "flex flex-col items-center w-full";
 
+  const baseLinkClasses = "flex flex-col items-center w-full";
   const getLinkClasses = ({ isActive }: { isActive: boolean }) =>
     `${baseLinkClasses} ${isActive ? "text-blue-500" : "text-gray-600 hover:text-black"}`;
 
   const [latestTs, setLatestTs] = useState<number>(0);
-  const lastRead = useMemo(() => getLastReadAt(teamName), [teamName]);
-  const [hasUnread, setHasUnread] = useState(false);
+  const [lastRead, setLastRead] = useState<number>(() => getLastReadAt(teamName));
+  const [hasUnread, setHasUnread] = useState<boolean>(false);
 
+  // Refs für Intervall-Callback
+  const latestTsRef = useRef<number>(0);
+  const lastReadRef = useRef<number>(lastRead);
+
+  useEffect(() => { latestTsRef.current = latestTs; }, [latestTs]);
+  useEffect(() => { lastReadRef.current = lastRead; }, [lastRead]);
+
+  // lastRead neu laden bei Teamwechsel
   useEffect(() => {
-    // Whenever route is Nachrichten, consider it read (MessageList also sets it, but this makes badge snappier)
-    if (location.pathname === "/nachrichten") {
+    const newLastRead = getLastReadAt(teamName);
+    setLastRead(newLastRead);
+    lastReadRef.current = newLastRead;
+  }, [teamName]);
+
+  // Auf Nachrichten-Seite → als gelesen markieren
+  useEffect(() => {
+    if (location.pathname === "/nachrichten" && latestTs > 0) {
+      // Persistieren des aktuellen Zeitstempels als "gelesen"
+      setLastReadNow(teamName);
+      setLastRead(latestTs);
       setHasUnread(false);
     }
-  }, [location.pathname]);
+  }, [location.pathname, latestTs, teamName]);
 
+  // Polling für neue Nachrichten
   useEffect(() => {
     let cancelled = false;
 
-    async function loadLatest() {
+    const loadLatest = async () => {
+      console.log("Polling Nachrichten...");
       try {
         const msgs = await fetchMessages();
-        const last = msgs.length ? msgs[msgs.length - 1] : undefined;
-        const ts = last ? new Date(last.created_at).getTime() : 0;
-        if (!cancelled) setLatestTs(ts);
-      } catch {
-        // ignore
-      }
-    }
+        if (!Array.isArray(msgs) || msgs.length === 0) return;
+        if (cancelled) return;
 
-    // initial fetch
+        const newest = msgs.reduce<typeof msgs[0] | undefined>((acc, m) => {
+          const t = new Date(m?.created_at ?? 0).getTime();
+          if (!acc) return m;
+            const accT = new Date(acc.created_at ?? 0).getTime();
+            return t > accT ? m : acc;
+        }, undefined);
+
+        let newestTimestamp = 0;
+        let newestMessage = "";
+        if (newest) {
+          newestTimestamp = newest.created_at ? new Date(newest.created_at).getTime() : 0;
+          newestMessage = newest.message;
+        };
+
+
+        const previousTimestamp = latestTsRef.current;
+        const currentLastRead = lastReadRef.current;
+
+        // Neue Nachricht erkannt? (neuer Timestamp ist größer als vorheriger)
+        const hasNewMessage = newestTimestamp > previousTimestamp && previousTimestamp !== 0;
+        console.log("Neueste Nachricht Timestamp:", {
+          newestTimestamp,
+          previousTimestamp,
+          currentLastRead,
+          hasNewMessage
+        });
+        // Push-Benachrichtigung bei neuer Nachricht
+        if (hasNewMessage && location.pathname !== "/nachrichten") {
+              notify("Neue Nachricht von Dondrekiel", { body: "Du hast eine neue Nachricht erhalten: " + newestMessage, icon: "/icon-192.png" });
+        }
+
+        // State aktualisieren
+        latestTsRef.current = newestTimestamp;
+        setLatestTs(newestTimestamp);
+
+        // Badge anzeigen wenn: neueste Nachricht ist neuer als last read
+        // UND wir sind nicht auf der Nachrichten-Seite
+        const shouldShowBadge = newestTimestamp > currentLastRead &&
+                                newestTimestamp > 0 &&
+                                location.pathname !== "/nachrichten";
+
+        setHasUnread(shouldShowBadge);
+
+        console.log("Polling-Ergebnis:", {
+          newestTimestamp,
+          currentLastRead,
+          hasUnread: shouldShowBadge,
+          currentPath: location.pathname
+        });
+
+      } catch (error) {
+        console.error("Fehler beim Laden der Nachrichten:", error);
+      }
+    };
+
+    // Initial laden
     void loadLatest();
-    // periodic refresh every 45s
-    const id = window.setInterval(loadLatest, 45000);
+
+    // Intervall starten (alle 5 Sekunden)
+    const intervalId = window.setInterval(loadLatest, 5000);
+
+    // Cleanup
     return () => {
       cancelled = true;
-      window.clearInterval(id);
+      window.clearInterval(intervalId);
     };
-  }, []);
+  }, [location.pathname, teamName]);
 
+  // Debug-Ausgabe
   useEffect(() => {
-    setHasUnread(latestTs > 0 && latestTs > lastRead);
-  }, [latestTs, lastRead]);
+    console.log("State-Update:", { latestTs, lastRead, hasUnread });
+  }, [latestTs, lastRead, hasUnread]);
 
   return (
     <nav
@@ -75,8 +149,8 @@ export function BottomNav() {
             <MessageCircle className="w-6 h-6" />
             {hasUnread && (
               <span
-                aria-hidden
-                className="absolute -top-1 -right-1 inline-block w-2 h-2 bg-red-500 rounded-full shadow"
+                aria-label="Neue Nachrichten vorhanden"
+                className="absolute -top-1 -right-1 inline-block w-2 h-2 bg-red-500 rounded-full shadow animate-pulse"
               />
             )}
           </div>

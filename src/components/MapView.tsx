@@ -181,6 +181,7 @@ const MapView = () => {
     mapRef.current?.setView([coords.latitude, coords.longitude], defaultZoom);
   };
 
+
   return (
     <div ref={containerRef} className="h-full relative z-0">
       <MapContainer
@@ -198,8 +199,11 @@ const MapView = () => {
         ref={mapRef}
         attributionControl={false}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
+        {/* OSM France "Forte" Layer */}
+        <TileLayer
+          url="https://a.forte.tiles.quaidorsay.fr/fr/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
         {/* User location marker */}
         {coords && (
           <Marker

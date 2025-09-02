@@ -39,15 +39,43 @@ export default function MessageList() {
   const [newMsg, setNewMsg] = useState("");
   const [sending, setSending] = useState(false);
 
+  // <-- neu: Merke Timestamp der zuletzt bekannten Nachricht
+  const lastKnownTsRef = useRef<number>(0);
+
   async function reloadMessages() {
     try {
       const data = await fetchMessages();
+      // Erkenne die zuletzt eingegangene Nachricht
+      const last = data.length ? data[data.length - 1] : undefined;
+      const ts = last ? new Date(last.created_at).getTime() : 0;
+
+      // Wenn wir zuvor schon Nachrichten hatten und jetzt eine neuere ankommt, loggen
+      if (lastKnownTsRef.current > 0 && ts > lastKnownTsRef.current) {
+        console.log("Neue Nachricht eingetroffen:", last);
+      }
+
+      // Aktualisiere Referenz und State
+      lastKnownTsRef.current = ts;
       setMessages(data);
     } catch {
       // keep old list, optionally show toast
       toast.error("Nachrichten konnten nicht aktualisiert werden");
     }
   }
+/*
+  useEffect(() => {
+    let cancelled = false;
+
+    // initial fetch
+    void reloadMessages();
+    // periodic refresh every 45s
+    const id = window.setInterval(reloadMessages, 5000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, []);
+*/
 
   useEffect(() => {
     let mounted = true;

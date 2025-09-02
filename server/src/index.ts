@@ -175,12 +175,11 @@ function startPolling(): void {
       params: { select: "id", order: "id.desc", limit: 1 },
     })
     .then(({ data }) => {
-      const id =
+      lastMessageId =
         Array.isArray(data) &&
         typeof (data[0] as Pick<DbMessage, "id"> | undefined)?.id === "number"
           ? Number((data[0] as Pick<DbMessage, "id">).id)
           : 0;
-      lastMessageId = id;
       console.log(`[push-sender] Initialized lastMessageId=${lastMessageId}`);
     })
     .catch((e: unknown) => {

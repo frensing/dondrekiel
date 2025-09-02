@@ -5,11 +5,10 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Station } from "@/types/Station.ts";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchStations } from "@/lib/stations.ts";
-import {  useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext.tsx";
 
 const StationList = () => {
@@ -56,30 +55,31 @@ const StationList = () => {
 
   return (
     <div className="space-y-2 p-4">
-        <Card
-          key={teamName}
-          className="cursor-pointer hover:bg-gray-50 transition-colors bg-red-50 border border-red-200"
-        >
-          <CardHeader className="p-4 pb-2">
-            <CardTitle className="text-lg font-bold flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              {teamName}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0">
-            <p className="text-sm text-gray-600">
-              Ihr seid {teamName}!
-            </p>
-            <p className="text-sm text-gray-600">
-              <a href="/logout"  rel="noreferrer" className="underline">Ausloggen</a>
-            </p>
-            <div className="flex justify-end mt-2">
-              <span className="text-xs text-gray-500">
-                {location.state?.coords.latitude.toFixed(4)}, {location.state?.coords.longitude.toFixed(4)}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+      <Card
+        key={teamName}
+        className="cursor-pointer hover:bg-gray-50 transition-colors bg-red-50 border border-red-200"
+      >
+        <CardHeader className="p-4 pb-2">
+          <CardTitle className="text-lg font-bold flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            {teamName}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-4 pt-0">
+          <p className="text-sm text-gray-600">Ihr seid {teamName}!</p>
+          <p className="text-sm text-gray-600">
+            <a href="/logout" rel="noreferrer" className="underline">
+              Ausloggen
+            </a>
+          </p>
+          <div className="flex justify-end mt-2">
+            <span className="text-xs text-gray-500">
+              {location.state?.coords.latitude.toFixed(4)},{" "}
+              {location.state?.coords.longitude.toFixed(4)}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
       {stations.map((station) => (
         <Card
           key={station.id}
@@ -95,7 +95,7 @@ const StationList = () => {
           <CardContent className="p-4 pt-0">
                         {station.description && (
             <p className="text-sm mt-1 whitespace-pre-wrap">
-                <div className="prose" 
+                <div className="prose"
                   dangerouslySetInnerHTML={{ __html: station.description }}
                 />
             </p>

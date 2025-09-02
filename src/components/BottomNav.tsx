@@ -45,7 +45,7 @@ export function BottomNav() {
   // Polling für neue Nachrichten
   useEffect(() => {
     let cancelled = false;
-    
+
     const loadLatest = async () => {
       console.log("Polling Nachrichten...");
       try {
@@ -65,7 +65,7 @@ export function BottomNav() {
         if (newest) {
           newestTimestamp = newest.created_at ? new Date(newest.created_at).getTime() : 0;
           newestMessage = newest.message;
-        }; 
+        };
 
 
         const previousTimestamp = latestTsRef.current;
@@ -90,10 +90,10 @@ export function BottomNav() {
 
         // Badge anzeigen wenn: neueste Nachricht ist neuer als last read
         // UND wir sind nicht auf der Nachrichten-Seite
-        const shouldShowBadge = newestTimestamp > currentLastRead && 
-                                newestTimestamp > 0 && 
+        const shouldShowBadge = newestTimestamp > currentLastRead &&
+                                newestTimestamp > 0 &&
                                 location.pathname !== "/nachrichten";
-        
+
         setHasUnread(shouldShowBadge);
 
         console.log("Polling-Ergebnis:", {
@@ -110,14 +110,14 @@ export function BottomNav() {
 
     // Initial laden
     void loadLatest();
-    
+
     // Intervall starten (alle 5 Sekunden)
     const intervalId = window.setInterval(loadLatest, 5000);
-    
+
     // Cleanup
-    return () => { 
-      cancelled = true; 
-      window.clearInterval(intervalId); 
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
     };
   }, [location.pathname, teamName]);
 
@@ -127,12 +127,14 @@ export function BottomNav() {
   }, [latestTs, lastRead, hasUnread]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t z-50"
-      style={{ 
-        bottom: "env(safe-area-inset-bottom, 0)", 
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0) + 15px)", 
-        WebkitOverflowScrolling: "touch" 
-      }}>
+    <nav
+      className="fixed bottom-0 left-0 right-0 bg-background border-t z-50"
+      style={{
+        bottom: "env(safe-area-inset-bottom, 0)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0) + 15px)", // extra touch target space
+        WebkitOverflowScrolling: "touch",
+      }}
+    >
       <div className="flex justify-between items-center h-16">
         <NavLink to="/" className={getLinkClasses}>
           <Map className="w-6 h-6" />
@@ -146,9 +148,9 @@ export function BottomNav() {
           <div className="relative">
             <MessageCircle className="w-6 h-6" />
             {hasUnread && (
-              <span 
+              <span
                 aria-label="Neue Nachrichten vorhanden"
-                className="absolute -top-1 -right-1 inline-block w-2 h-2 bg-red-500 rounded-full shadow animate-pulse" 
+                className="absolute -top-1 -right-1 inline-block w-2 h-2 bg-red-500 rounded-full shadow animate-pulse"
               />
             )}
           </div>

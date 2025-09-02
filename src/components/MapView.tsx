@@ -181,7 +181,7 @@ const MapView = () => {
     mapRef.current?.setView([coords.latitude, coords.longitude], defaultZoom);
   };
 
-  
+
   return (
     <div ref={containerRef} className="h-full relative z-0">
       <MapContainer
@@ -207,25 +207,24 @@ const MapView = () => {
         {/* User location marker */}
         {coords && (
           <Marker
-        position={[coords.latitude, coords.longitude]}
-        icon={L.divIcon({
-          className: "relative",
-          html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10],
-        })}
+            position={[coords.latitude, coords.longitude]}
+            icon={L.divIcon({
+              className: "relative",
+              html: `<div class="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>`,
+              iconSize: [20, 20],
+              iconAnchor: [10, 10],
+            })}
           >
-          <Popup>
-            <div className="p-2">
-              <h3 className="font-bold">Hier seid ihr!</h3>
-              <p className="text-sm text-gray-600">
-                Position:&nbsp; 
-                {coords.latitude != null ? coords.latitude.toFixed(4) : "?"}, 
-                {coords.longitude != null ? coords.longitude.toFixed(4) : "?"}
-              </p>
-            </div>
-          </Popup>
-
+            <Popup>
+              <div className="p-2">
+                <h3 className="font-bold">Hier seid ihr!</h3>
+                <p className="text-sm text-gray-600">
+                  Position:&nbsp;
+                  {coords.latitude != null ? coords.latitude.toFixed(4) : "?"},
+                  {coords.longitude != null ? coords.longitude.toFixed(4) : "?"}
+                </p>
+              </div>
+            </Popup>
           </Marker>
         )}
 
@@ -234,39 +233,43 @@ const MapView = () => {
           .filter((t) => t.latitude != null && t.longitude != null)
           .filter((t) => (userId ? t.id !== parseInt(userId) : true))
           .map((t) => (
-        <Marker
-          key={`team-${t.id}`}
-          position={[t.latitude as number, t.longitude as number]}
-          icon={L.divIcon({
-            className: "relative",
-            html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
-            iconSize: [18, 18],
-            iconAnchor: [9, 9],
-          })}
-        >
-          <Popup>
-            <div className="p-2">
-            {(role === "dondrekiel_admin" || role === "dondrekiel_station") && (
-              <>
-                <h3 className="font-bold">{t.name}</h3>
-                <div className="text-xs text-gray-500">Team ID: {t.id}</div>
-                <div className="text-xs text-gray-500">Zeit: {t.locationdate != null ? t.locationdate : "unbekannt"}</div>
-
-              </>
-            )}
-            {(role === "team_user") && (
-              <>
-                <h3 className="font-bold">Hier ist ein anderes Team!</h3>
-              </>
-            )}
-          <p className="text-sm text-gray-600">
-            Position:&nbsp; 
-            {t.latitude != null ? t.latitude.toFixed(4) : "?"}, 
-            {t.longitude != null ? t.longitude.toFixed(4) : "?"}
-          </p>
-            </div>
-          </Popup>
-        </Marker>
+            <Marker
+              key={`team-${t.id}`}
+              position={[t.latitude as number, t.longitude as number]}
+              icon={L.divIcon({
+                className: "relative",
+                html: `<div class="w-4 h-4 bg-green-700 rounded-full border-2 border-white shadow-md"></div>`,
+                iconSize: [18, 18],
+                iconAnchor: [9, 9],
+              })}
+            >
+              <Popup>
+                <div className="p-2">
+                  {(role === "dondrekiel_admin" ||
+                    role === "dondrekiel_station") && (
+                    <>
+                      <div className="text-xs text-gray-500">
+                        Team ID: {t.id}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Zeit:{" "}
+                        {t.locationdate != null ? t.locationdate : "unbekannt"}
+                      </div>
+                    </>
+                  )}
+                  {role === "team_user" && (
+                    <>
+                      <h3 className="font-bold">Hier ist ein anderes Team!</h3>
+                    </>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    Position:&nbsp;
+                    {t.latitude != null ? t.latitude.toFixed(4) : "?"},
+                    {t.longitude != null ? t.longitude.toFixed(4) : "?"}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
           ))}
 
         {stations.map((s) => createStationMarker(s))}

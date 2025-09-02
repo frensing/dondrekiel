@@ -1,0 +1,45 @@
+### Create or upsert a push subscription
+# @name upsert_subscription
+POST https://app.dondrekiel.de/api/web_push_subscriptions
+Prefer: resolution=merge-duplicates
+Content-Type: application/json
+Authorization: Bearer {{dev.token}}
+
+[
+  {
+    "endpoint": "https://fcm.googleapis.com/fcm/send/abc...",
+    "p256dh": "<base64>",
+    "auth": "<base64>",
+    "user_agent": "Mozilla/5.0 ...",
+    "team_name": "demo",
+    "user_id": "123"
+  }
+]
+
+### Delete a subscription by endpoint
+# @name delete_subscription
+DELETE https://app.dondrekiel.de/api/web_push_subscriptions
+Content-Type: application/json
+Authorization: Bearer {{dev.token}}
+
+{
+  "endpoint": "https://fcm.googleapis.com/fcm/send/abc..."
+}
+
+### List subscriptions for a team
+# @name list_team_subs
+GET https://app.dondrekiel.de/api/web_push_subscriptions?team_name=eq.demo
+Authorization: Bearer {{dev.token}}
+
+### Optional RPC to initiate a notification (if you add it server-side)
+# @name notify_message
+POST https://app.dondrekiel.de/api/rpc/notify_message
+Content-Type: application/json
+Authorization: Bearer {{dev.token}}
+
+{
+  "team_name": "demo",
+  "title": "Neue Nachricht",
+  "body": "Schau mal rein!",
+  "url": "/nachrichten"
+}

@@ -41,9 +41,7 @@ export const createStationMarker = (station: Station) => {
           <h3 className="font-bold">{station.title}</h3>
           {station.description && (
             <p className="text-sm mt-1 whitespace-pre-wrap">
-                <div className="prose" 
-                  dangerouslySetInnerHTML={{ __html: station.description }}
-                />
+              {station.description}
             </p>
           )}
         </div>

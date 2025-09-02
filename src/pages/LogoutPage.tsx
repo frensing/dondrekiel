@@ -15,7 +15,7 @@ export default function Logout() {
         await fetch("/logout", {
           method: "GET", // oder "GET" je nach Server-Implementierung
           credentials: "include",
-          headers: {  },
+          headers: {},
         });
       } catch (e) {
         console.warn("Server logout failed:", e);

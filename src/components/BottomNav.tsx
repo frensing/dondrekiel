@@ -22,6 +22,7 @@ export function BottomNav() {
   // Refs für Intervall-Callback
   const latestTsRef = useRef<number>(0);
   const lastReadRef = useRef<number>(lastRead);
+  const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
     latestTsRef.current = latestTs;
@@ -47,9 +48,7 @@ export function BottomNav() {
     }
   }, [location.pathname, latestTs, teamName]);
 
-  // Event-driven refresh for unread badge (no polling):
-  // - initial fetch on mount or team change
-  // - refresh once when app/tab becomes visible again
+  // Foreground polling: poll only while the document is visible
   useEffect(() => {
     let cancelled = false;
 
@@ -87,20 +86,36 @@ export function BottomNav() {
       }
     };
 
-    // Initial load
-    void loadLatest();
+    const startPolling = () => {
+      if (intervalRef.current) return; // already polling
+      // immediate load then interval
+      void loadLatest();
+      intervalRef.current = window.setInterval(loadLatest, 5000);
+    };
 
-    // Refresh when tab becomes visible again
-    const onVisibility = () => {
-      if (document.visibilityState === "visible") {
-        void loadLatest();
+    const stopPolling = () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    };
+
+    // initialize based on current visibility
+    onVisibility();
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       cancelled = true;
       document.removeEventListener("visibilitychange", onVisibility);
+      stopPolling();
     };
   }, [location.pathname, teamName]);
 

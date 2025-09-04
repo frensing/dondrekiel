@@ -1,6 +1,12 @@
 import { api } from "@/lib/api.ts";
 
-const vapidPublicKey =
+// Prefer environment VAPID public key; fallback to baked-in default (for dev)
+const VAPID_PUBLIC_KEY_ENV = (
+  import.meta as unknown as {
+    env?: Record<string, unknown>;
+  }
+)?.env?.VITE_VAPID_PUBLIC_KEY as string | undefined;
+const VAPID_PUBLIC_KEY_FALLBACK =
   "BK41rUgCe-klV_kpg1RgPILIc_ZuE_63PJlJ4CP-i3Iw4p4BrZlaQcGGtGE_nhGDD909BGfhwZyVqFciDQRdEn8";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -28,8 +34,7 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
   if (!("serviceWorker" in navigator))
     throw new Error("Service Worker not supported");
   // Vite PWA injects register automatically with registerType: autoUpdate
-  const reg = await navigator.serviceWorker.ready;
-  return reg;
+  return await navigator.serviceWorker.ready;
 }
 
 export async function getOrCreateSubscription(
@@ -80,7 +85,10 @@ export async function registerPushSubscription(options?: {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return null;
 
-  const vapidKey = vapidPublicKey;
+  const vapidKey =
+    options?.vapidPublicKey ||
+    VAPID_PUBLIC_KEY_ENV ||
+    VAPID_PUBLIC_KEY_FALLBACK;
   if (!vapidKey)
     throw new Error("Missing VAPID public key (VITE_VAPID_PUBLIC_KEY)");
 

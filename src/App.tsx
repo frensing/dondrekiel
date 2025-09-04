@@ -11,6 +11,8 @@ import LogoutPage from "@/pages/LogoutPage.tsx";
 import AdminCreateTeamPage from "@/pages/AdminCreateTeamPage.tsx";
 import LocationReporter from "@/components/LocationReporter.tsx";
 import InstallPWAButton from "@/components/InstallPWAButton.tsx";
+import { useEffect } from "react";
+import { registerPushSubscription } from "@/lib/push.ts";
 
 function AdminOnly({ children }: { children: React.ReactNode }) {
   const { isAdmin } = useAuth();
@@ -28,7 +30,26 @@ function AdminOnly({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role, teamName, userId } = useAuth();
+
+  // Auto-request Notification permission and register Push after login for team users
+  useEffect(() => {
+    const isTeamUser = role !== "dondrekiel_admin";
+    if (!isAuthenticated || !isTeamUser) return;
+    if (!teamName || !userId) return;
+    if (!("Notification" in window)) return;
+    // If permission is default or already granted, ensure registration/upsert. If denied, do nothing.
+    if (
+      Notification.permission === "default" ||
+      Notification.permission === "granted"
+    ) {
+      registerPushSubscription({
+        meta: { team_name: teamName, user_id: userId },
+      }).catch((e) => {
+        console.warn("Push registration failed:", e?.message || e);
+      });
+    }
+  }, [isAuthenticated, role, teamName, userId]);
 
   if (!isAuthenticated) {
     return (

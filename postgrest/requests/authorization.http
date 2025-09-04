@@ -17,3 +17,11 @@ Authorization: Bearer {{auth_token}}
 
 ###
 GET https://app.dondrekiel.de/api/users
+
+###
+GET https://app.dondrekiel.de/api/messages
+Authorization: Bearer {{auth_token}}
+
+###
+GET https://app.dondrekiel.de/api/web_push_subscriptions
+Authorization: Bearer {{auth_token}}

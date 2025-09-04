@@ -8,16 +8,16 @@ Content-Type: application/json
 }
 
 > {%
-    client.global.set("auth_token_admin", response.body.token);
+    client.global.set("auth_token", response.body.token);
 %}
 
 ### Get Messages
 GET https://app.dondrekiel.de/api/messages
-Authorization: Bearer {{auth_token_admin}}
+Authorization: Bearer {{auth_token}}
 
 ### Send Messages
 POST https://app.dondrekiel.de/api/messages
-Authorization: Bearer {{auth_token_admin}}
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -28,4 +28,4 @@ Content-Type: application/json
 
 ### Delete Message
 DELETE https://app.dondrekiel.de/api/messages?id=eq.3
-Authorization: Bearer {{auth_token_admin}}
+Authorization: Bearer {{auth_token}}

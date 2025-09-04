@@ -1,8 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Flag, Map, MessageCircle } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchMessages } from "@/lib/messages.ts";
-import { notify } from "@/lib/notifications.ts";
 import { useAuth } from "@/context/AuthContext.tsx";
 import { getLastReadAt, setLastReadNow } from "@/lib/unread.ts";
 
@@ -15,15 +14,21 @@ export function BottomNav() {
     `${baseLinkClasses} ${isActive ? "text-blue-500" : "text-gray-600 hover:text-black"}`;
 
   const [latestTs, setLatestTs] = useState<number>(0);
-  const [lastRead, setLastRead] = useState<number>(() => getLastReadAt(teamName));
+  const [lastRead, setLastRead] = useState<number>(() =>
+    getLastReadAt(teamName),
+  );
   const [hasUnread, setHasUnread] = useState<boolean>(false);
 
   // Refs für Intervall-Callback
   const latestTsRef = useRef<number>(0);
   const lastReadRef = useRef<number>(lastRead);
 
-  useEffect(() => { latestTsRef.current = latestTs; }, [latestTs]);
-  useEffect(() => { lastReadRef.current = lastRead; }, [lastRead]);
+  useEffect(() => {
+    latestTsRef.current = latestTs;
+  }, [latestTs]);
+  useEffect(() => {
+    lastReadRef.current = lastRead;
+  }, [lastRead]);
 
   // lastRead neu laden bei Teamwechsel
   useEffect(() => {
@@ -42,82 +47,60 @@ export function BottomNav() {
     }
   }, [location.pathname, latestTs, teamName]);
 
-  // Polling für neue Nachrichten
+  // Event-driven refresh for unread badge (no polling):
+  // - initial fetch on mount or team change
+  // - refresh once when app/tab becomes visible again
   useEffect(() => {
     let cancelled = false;
 
     const loadLatest = async () => {
-      console.log("Polling Nachrichten...");
       try {
         const msgs = await fetchMessages();
         if (!Array.isArray(msgs) || msgs.length === 0) return;
         if (cancelled) return;
 
-        const newest = msgs.reduce<typeof msgs[0] | undefined>((acc, m) => {
+        const newest = msgs.reduce<(typeof msgs)[0] | undefined>((acc, m) => {
           const t = new Date(m?.created_at ?? 0).getTime();
           if (!acc) return m;
-            const accT = new Date(acc.created_at ?? 0).getTime();
-            return t > accT ? m : acc;
+          const accT = new Date(acc.created_at ?? 0).getTime();
+          return t > accT ? m : acc;
         }, undefined);
 
-        let newestTimestamp = 0;
-        let newestMessage = "";
-        if (newest) {
-          newestTimestamp = newest.created_at ? new Date(newest.created_at).getTime() : 0;
-          newestMessage = newest.message;
-        };
+        const newestTimestamp = newest?.created_at
+          ? new Date(newest.created_at).getTime()
+          : 0;
 
-
-        const previousTimestamp = latestTsRef.current;
         const currentLastRead = lastReadRef.current;
 
-        // Neue Nachricht erkannt? (neuer Timestamp ist größer als vorheriger)
-        const hasNewMessage = newestTimestamp > previousTimestamp && previousTimestamp !== 0;
-        console.log("Neueste Nachricht Timestamp:", {
-          newestTimestamp,
-          previousTimestamp,
-          currentLastRead,
-          hasNewMessage
-        });
-        // Push-Benachrichtigung bei neuer Nachricht
-        if (hasNewMessage && location.pathname !== "/nachrichten") {
-              notify("Neue Nachricht von Dondrekiel", { body: "Du hast eine neue Nachricht erhalten: " + newestMessage, icon: "/icon-192.png" });
-        }
-
-        // State aktualisieren
+        // Update state
         latestTsRef.current = newestTimestamp;
         setLatestTs(newestTimestamp);
 
-        // Badge anzeigen wenn: neueste Nachricht ist neuer als last read
-        // UND wir sind nicht auf der Nachrichten-Seite
-        const shouldShowBadge = newestTimestamp > currentLastRead &&
-                                newestTimestamp > 0 &&
-                                location.pathname !== "/nachrichten";
-
+        // Show badge if there is something newer than last read and we're not on the messages page
+        const shouldShowBadge =
+          newestTimestamp > currentLastRead &&
+          newestTimestamp > 0 &&
+          location.pathname !== "/nachrichten";
         setHasUnread(shouldShowBadge);
-
-        console.log("Polling-Ergebnis:", {
-          newestTimestamp,
-          currentLastRead,
-          hasUnread: shouldShowBadge,
-          currentPath: location.pathname
-        });
-
       } catch (error) {
         console.error("Fehler beim Laden der Nachrichten:", error);
       }
     };
 
-    // Initial laden
+    // Initial load
     void loadLatest();
 
-    // Intervall starten (alle 5 Sekunden)
-    const intervalId = window.setInterval(loadLatest, 5000);
+    // Refresh when tab becomes visible again
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        void loadLatest();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
 
-    // Cleanup
     return () => {
       cancelled = true;
-      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [location.pathname, teamName]);
 

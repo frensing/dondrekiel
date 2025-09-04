@@ -1,9 +1,22 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST https://app.dondrekiel.de/api/rpc/login
+Content-Type: application/json
+
+{
+  "name": "{{teamname}}",
+  "password": "{{teampassword}}"
+}
+
+> {%
+    client.global.set("auth_token_team", response.body.token);
+%}
+
 ### Create or upsert a push subscription
 # @name upsert_subscription
 POST https://app.dondrekiel.de/api/web_push_subscriptions
 Prefer: resolution=merge-duplicates
 Content-Type: application/json
-Authorization: Bearer {{dev.token}}
+Authorization: Bearer {{auth_token_team}}
 
 [
   {
@@ -11,8 +24,8 @@ Authorization: Bearer {{dev.token}}
     "p256dh": "<base64>",
     "auth": "<base64>",
     "user_agent": "Mozilla/5.0 ...",
-    "team_name": "demo",
-    "user_id": "123"
+    "team_name": "testpushteam2",
+    "user_id": "98"
   }
 ]
 
@@ -20,7 +33,7 @@ Authorization: Bearer {{dev.token}}
 # @name delete_subscription
 DELETE https://app.dondrekiel.de/api/web_push_subscriptions
 Content-Type: application/json
-Authorization: Bearer {{dev.token}}
+Authorization: Bearer {{auth_token_team}}
 
 {
   "endpoint": "https://fcm.googleapis.com/fcm/send/abc..."
@@ -29,13 +42,13 @@ Authorization: Bearer {{dev.token}}
 ### List subscriptions for a team
 # @name list_team_subs
 GET https://app.dondrekiel.de/api/web_push_subscriptions?team_name=eq.demo
-Authorization: Bearer {{dev.token}}
+Authorization: Bearer {{auth_token_team}}
 
 ### Optional RPC to initiate a notification (if you add it server-side)
 # @name notify_message
 POST https://app.dondrekiel.de/api/rpc/notify_message
 Content-Type: application/json
-Authorization: Bearer {{dev.token}}
+Authorization: Bearer {{auth_token_team}}
 
 {
   "team_name": "demo",

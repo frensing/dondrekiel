@@ -1,5 +1,8 @@
 import { api } from "@/lib/api.ts";
 
+const vapidPublicKey =
+  "BK41rUgCe-klV_kpg1RgPILIc_ZuE_63PJlJ4CP-i3Iw4p4BrZlaQcGGtGE_nhGDD909BGfhwZyVqFciDQRdEn8";
+
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   // From https://www.npmjs.com/package/web-push docs
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -77,9 +80,7 @@ export async function registerPushSubscription(options?: {
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return null;
 
-  const vapidKey =
-    options?.vapidPublicKey ??
-    (import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined);
+  const vapidKey = vapidPublicKey;
   if (!vapidKey)
     throw new Error("Missing VAPID public key (VITE_VAPID_PUBLIC_KEY)");
 

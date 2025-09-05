@@ -249,7 +249,7 @@ const MapView = () => {
                     role === "dondrekiel_station") && (
                     <>
                       <div className="text-xs text-gray-500">
-                        Team ID: {t.id}
+                        Team: {t.name}
                       </div>
                       <div className="text-xs text-gray-500">
                         Zeit:{" "}
